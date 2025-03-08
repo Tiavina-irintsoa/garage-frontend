@@ -10,5 +10,5 @@ Ce projet a été réalisé par :
 
 ## Technologies utilisées
 - **Back-end** : Nodejs
-- **Front-end** : Angumar
+- **Front-end** : Angular
 - **Base de données** : MongoDB
