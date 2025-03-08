@@ -1,4 +1,14 @@
-﻿# garage-frontend
+# Garage Frontend
 
-1840 RAKOTONIRINA Tiavina Irintsoa Nancyah
-1906 RAZAFINJAKA Ralph Yoan
+## Description
+Garage Web App  est une application web conçue pour la gestion des activités d'un garage automobile. 
+
+## Auteurs
+Ce projet a été réalisé par :
+- **1840 RAKOTONIRINA Tiavina Irintsoa**
+- **1906 RAZAFINJAKA Ralph Yoan**
+
+## Technologies utilisées
+- **Back-end** : Nodejs
+- **Front-end** : Angumar
+- **Base de données** : MongoDB
