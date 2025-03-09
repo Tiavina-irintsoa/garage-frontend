@@ -1,88 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
-
-:root {
-  --primary-color: #023e8a;
-  --secondary-color: #caf0f8;
-  --text-color: #2D3436;
-  --light-bg: #f8fafc;
-  --white: #ffffff;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  line-height: 1.6;
-  color: var(--text-color);
-  background-color: var(--light-bg);
-}
-
-.container {
-  width: 100wh;
-  margin: 0 auto;
-  padding: 0 24px;
-
-}
-.header{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.hero-content{
-    text-align: center;
-}
-.btn-primary {
-  background: var(--white);
-  color: var(--primary-color);
-  padding: 16px 32px;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(2, 62, 138, 0.2);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(2, 62, 138, 0.3);
-}
-
-.section {
-  padding: 100px 0;
-}
-
-.section-title {
-  text-align: center;
-  margin-bottom: 20px;
-  color: var(--primary-color);
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.section-subtitle {
-  text-align: center;
-  margin-bottom: 60px;
-  color: var(--text-color);
-  font-size: 1.25rem;
-  opacity: 0.85;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.card-hover {
-  transition: all 0.3s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+@theme {
+    --color-blue-primary: oklch(38.03% 0.1386 258.03);
+    --color-blue-secondary: oklch(93.06% 0.0408 211.84);
 }

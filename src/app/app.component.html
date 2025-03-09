@@ -2,170 +2,370 @@
 
 <!-- Hero Section -->
 <header
-  class="hero"
-  style="
-    background: linear-gradient(rgba(2, 62, 138, 0.85), rgba(2, 62, 138, 0.95)),
-      url('/assets/images/pexels-photo-3807386.jpeg') center/cover;
-  "
+  class="relative min-h-[90vh] flex items-center text-white overflow-hidden"
 >
-  <div class="container header">
-    <div class="hero-content">
-      <h1>Votre Garage de Confiance</h1>
-      <p>
+  <div class="absolute inset-0 bg-blue-primary opacity-95 z-10"></div>
+  <div
+    class="absolute inset-0 bg-[url('/assets/images/pexels-photo-3807386.jpeg')] bg-center bg-cover"
+  ></div>
+
+  <div class="container mx-auto px-6 relative z-20 flex flex-col items-center">
+    <div class="max-w-2xl text-center ">
+      <h1
+        class=" md:text-6xl font-extrabold leading-tight tracking-tight mb-6"
+      >
+        Votre Garage de Confiance
+      </h1>
+      <p class="text-xl opacity-90 mb-10">
         Service professionnel et expertise automobile à votre service. Que ce
-        soit pour l’entretien, la réparation ou le diagnostic de votre véhicule.
+        soit pour l'entretien, la réparation ou le diagnostic de votre véhicule.
       </p>
-      <button class="btn-primary">Prendre Rendez-vous</button>
+      <button
+        class="bg-blue-secondary text-blue-primary px-8 py-4 rounded-4xl text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+      >
+        Prendre Rendez-vous
+      </button>
     </div>
   </div>
 </header>
 
 <!-- Services Section -->
-<section
-  class="section services-section"
-  style="background-color: var(--light-bg)"
->
-  <div class="container">
-    <h2 class="section-title">Nos Services</h2>
-    <p class="section-subtitle">Des solutions complètes pour votre véhicule</p>
+<section class="py-24 bg-light">
+  <div class="container mx-auto px-6">
+    <h2
+      class="text-4xl md:text-5xl font-extrabold text-blue-primary text-center mb-4"
+    >
+      Nos Services
+    </h2>
+    <p class="text-xl text-center text-gray-600 max-w-2xl mx-auto mb-16">
+      Des solutions complètes pour votre véhicule
+    </p>
 
-    <div class="services-grid">
-      <div class="service-card">
-        <i class="fas fa-wrench"></i>
-        <h3>Réparation Mécanique</h3>
-        <p>Diagnostic et réparation de tous types de pannes mécaniques</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div
+        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div
+          class="w-20 h-20 bg-secondary rounded-xl flex items-center justify-center mb-6"
+        >
+          <i class="fas fa-wrench text-3xl text-blue-primary"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-primary mb-4">
+          Réparation Mécanique
+        </h3>
+        <p class="text-gray-600">
+          Diagnostic et réparation de tous types de pannes mécaniques
+        </p>
       </div>
 
-      <div class="service-card">
-        <i class="fas fa-car"></i>
-        <h3>Entretien Régulier</h3>
-        <p>Services de maintenance préventive pour votre véhicule</p>
+      <div
+        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div
+          class="w-20 h-20 bg-secondary rounded-xl flex items-center justify-center mb-6"
+        >
+          <i class="fas fa-car text-3xl text-blue-primary"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-primary mb-4">
+          Entretien Régulier
+        </h3>
+        <p class="text-gray-600">
+          Services de maintenance préventive pour votre véhicule
+        </p>
       </div>
 
-      <div class="service-card">
-        <i class="fas fa-oil-can"></i>
-        <h3>Vidange</h3>
-        <p>Changement d'huile et des filtres</p>
+      <div
+        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div
+          class="w-20 h-20 bg-secondary rounded-xl flex items-center justify-center mb-6"
+        >
+          <i class="fas fa-oil-can text-3xl text-blue-primary"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-primary mb-4">Vidange</h3>
+        <p class="text-gray-600">Changement d'huile et des filtres</p>
       </div>
 
-      <div class="service-card">
-        <i class="fas fa-car-battery"></i>
-        <h3>Diagnostic Électronique</h3>
-        <p>Analyse complète des systèmes électroniques</p>
+      <div
+        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div
+          class="w-20 h-20 bg-secondary rounded-xl flex items-center justify-center mb-6"
+        >
+          <i class="fas fa-car-battery text-3xl text-blue-primary"></i>
+        </div>
+        <h3 class="text-xl font-bold text-blue-primary mb-4">
+          Diagnostic Électronique
+        </h3>
+        <p class="text-gray-600">Analyse complète des systèmes électroniques</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Pricing Section -->
-<section class="section pricing-section">
-  <div class="container">
-    <h2 class="section-title">Nos Tarifs</h2>
-    <p class="section-subtitle">
+<section class="py-24">
+  <div class="container mx-auto px-6">
+    <h2
+      class="text-4xl md:text-5xl font-extrabold text-blue-primary text-center mb-4"
+    >
+      Nos Tarifs
+    </h2>
+    <p class="text-xl text-center text-gray-600 max-w-2xl mx-auto mb-16">
       Des prix transparents pour des services de qualité
     </p>
 
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="pricing-header">
-          <h3>Entretien Basique</h3>
-          <div class="price">
-            <span class="amount">59</span>
-            <span class="currency">€</span>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+      <!-- Basic Plan -->
+      <div
+        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <div class="text-center mb-8">
+          <h3 class="text-2xl font-bold text-blue-primary mb-4">
+            Entretien Basique
+          </h3>
+          <div class="flex justify-center items-start">
+            <span class="text-5xl font-extrabold text-blue-primary">59</span>
+            <span class="text-2xl font-semibold text-blue-primary mt-2 ml-1"
+              >€</span
+            >
           </div>
-          <p class="price-description">À partir de</p>
+          <p class="text-gray-500 mt-2">À partir de</p>
         </div>
-        <ul class="pricing-features">
-          <li><i class="fas fa-check"></i> Vidange huile moteur</li>
-          <li><i class="fas fa-check"></i> Remplacement filtre à huile</li>
-          <li><i class="fas fa-check"></i> Vérification niveaux</li>
-          <li><i class="fas fa-check"></i> Contrôle pression pneus</li>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Vidange huile moteur</span>
+          </li>
+          <!-- Autres éléments de la liste -->
         </ul>
-        <button class="btn-primary">Prendre RDV</button>
+        <button
+          class="w-full bg-blue-secondary text-blue-primary rounded-4xl py-3 font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+        >
+          Prendre RDV
+        </button>
       </div>
 
-      <div class="pricing-card featured">
-        <div class="pricing-header">
-          <div class="featured-badge">Plus populaire</div>
-          <h3>Révision Complète</h3>
-          <div class="price">
-            <span class="amount">159</span>
-            <span class="currency">€</span>
-          </div>
-          <p class="price-description">À partir de</p>
+      <!-- Featured Plan -->
+      <div
+        class="bg-white p-8 rounded-2xl shadow-xl transform -translate-y-4 border-2 border-blue-primary relative"
+      >
+        <div
+          class="absolute top-4 right-4 bg-blue-secondary text-blue-primary px-4 py-1 rounded-full text-sm font-semibold"
+        >
+          Plus populaire
         </div>
-        <ul class="pricing-features">
-          <li><i class="fas fa-check"></i> Tout l'entretien basique</li>
-          <li><i class="fas fa-check"></i> Diagnostic électronique</li>
-          <li><i class="fas fa-check"></i> Contrôle freinage</li>
-          <li><i class="fas fa-check"></i> Vérification suspension</li>
-          <li><i class="fas fa-check"></i> Contrôle batterie</li>
+        <div class="text-center mb-8">
+          <h3 class="text-2xl font-bold text-blue-primary mb-4">
+            Révision Complète
+          </h3>
+          <div class="flex justify-center items-start">
+            <span class="text-5xl font-extrabold text-blue-primary">159</span>
+            <span class="text-2xl font-semibold text-blue-primary mt-2 ml-1"
+              >€</span
+            >
+          </div>
+          <p class="text-gray-500 mt-2">À partir de</p>
+        </div>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Tout l'entretien basique</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Diagnostic électronique</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Contrôle freinage</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Vérification suspension</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Contrôle batterie</span>
+          </li>
         </ul>
-        <button class="btn-primary">Prendre RDV</button>
+        <button
+          class="w-full bg-blue-secondary text-blue-primary rounded-4xl py-3 font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+        >
+          Prendre RDV
+        </button>
       </div>
 
-      <div class="pricing-card">
-        <div class="pricing-header">
-          <h3>Diagnostic Complet</h3>
-          <div class="price">
-            <span class="amount">89</span>
-            <span class="currency">€</span>
+      <!-- Diagnostic Plan -->
+      <div
+        class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <div class="text-center mb-8">
+          <h3 class="text-2xl font-bold text-blue-primary mb-4">
+            Diagnostic Complet
+          </h3>
+          <div class="flex justify-center items-start">
+            <span class="text-5xl font-extrabold text-blue-primary">89</span>
+            <span class="text-2xl font-semibold text-blue-primary mt-2 ml-1"
+              >€</span
+            >
           </div>
-          <p class="price-description">Forfait unique</p>
+          <p class="text-gray-500 mt-2">Forfait unique</p>
         </div>
-        <ul class="pricing-features">
-          <li><i class="fas fa-check"></i> Diagnostic électronique</li>
-          <li><i class="fas fa-check"></i> Test des systèmes</li>
-          <li><i class="fas fa-check"></i> Rapport détaillé</li>
-          <li><i class="fas fa-check"></i> Recommandations</li>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Diagnostic électronique</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Test des systèmes</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Rapport détaillé</span>
+          </li>
+          <li class="flex items-center">
+            <div
+              class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-check text-sm text-blue-primary"></i>
+            </div>
+            <span class="text-gray-600">Recommandations</span>
+          </li>
         </ul>
-        <button class="btn-primary">Prendre RDV</button>
+        <button
+          class="w-full bg-blue-secondary text-blue-primary rounded-4xl py-3 font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+        >
+          Prendre RDV
+        </button>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Expertise Section -->
-<section class="section expertise-section">
-  <div class="container">
-    <div class="expertise-grid">
-      <div class="expertise-content">
-        <h2 class="section-title">Notre Expertise</h2>
-        <p class="expertise-text">
+<section class="py-24 bg-white rounded-3xl my-10">
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+      <div class="lg:col-span-3">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-blue-primary mb-6">
+          Notre Expertise
+        </h2>
+        <p class="text-gray-600 text-lg leading-relaxed mb-10">
           Avec plus de 15 ans d'expérience dans le secteur automobile, notre
           équipe de professionnels qualifiés s'engage à fournir un service
           d'excellence pour tous types de véhicules.
         </p>
-        <ul class="expertise-list">
-          <li>
-            <i class="fas fa-check"></i> Techniciens certifiés et formés
-            régulièrement
+        <ul class="space-y-6">
+          <li class="flex items-center">
+            <div
+              class="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-check text-blue-primary"></i>
+            </div>
+            <span class="text-gray-700 text-lg"
+              >Techniciens certifiés et formés régulièrement</span
+            >
           </li>
-          <li>
-            <i class="fas fa-check"></i> Équipements et outils de diagnostic
-            dernière génération
+          <li class="flex items-center">
+            <div
+              class="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-check text-blue-primary"></i>
+            </div>
+            <span class="text-gray-700 text-lg"
+              >Équipements et outils de diagnostic dernière génération</span
+            >
           </li>
-          <li>
-            <i class="fas fa-check"></i> Intervention sur toutes marques de
-            véhicules
+          <li class="flex items-center">
+            <div
+              class="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-check text-blue-primary"></i>
+            </div>
+            <span class="text-gray-700 text-lg"
+              >Intervention sur toutes marques de véhicules</span
+            >
           </li>
-          <li>
-            <i class="fas fa-check"></i> Garantie sur toutes nos réparations
+          <li class="flex items-center">
+            <div
+              class="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-check text-blue-primary"></i>
+            </div>
+            <span class="text-gray-700 text-lg"
+              >Garantie sur toutes nos réparations</span
+            >
           </li>
         </ul>
       </div>
-      <div class="expertise-stats">
-        <div class="stat-item">
-          <span class="stat-number">15+</span>
-          <span class="stat-label">Années d'expérience</span>
+      <div class="lg:col-span-2 grid grid-cols-1 gap-6">
+        <div
+          class="bg-light p-8 rounded-2xl border border-primary/10 hover:-translate-y-1 transition-transform duration-300"
+        >
+          <span class="block text-4xl font-extrabold text-blue-primary mb-2"
+            >15+</span
+          >
+          <span class="text-gray-600 text-lg font-medium"
+            >Années d'expérience</span
+          >
         </div>
-        <div class="stat-item">
-          <span class="stat-number">1000+</span>
-          <span class="stat-label">Clients satisfaits</span>
+        <div
+          class="bg-light p-8 rounded-2xl border border-primary/10 hover:-translate-y-1 transition-transform duration-300"
+        >
+          <span class="block text-4xl font-extrabold text-blue-primary mb-2"
+            >1000+</span
+          >
+          <span class="text-gray-600 text-lg font-medium"
+            >Clients satisfaits</span
+          >
         </div>
-        <div class="stat-item">
-          <span class="stat-number">99%</span>
-          <span class="stat-label">Satisfaction client</span>
+        <div
+          class="bg-light p-8 rounded-2xl border border-primary/10 hover:-translate-y-1 transition-transform duration-300"
+        >
+          <span class="block text-4xl font-extrabold text-blue-primary mb-2"
+            >99%</span
+          >
+          <span class="text-gray-600 text-lg font-medium"
+            >Satisfaction client</span
+          >
         </div>
       </div>
     </div>
@@ -173,88 +373,121 @@
 </section>
 
 <!-- Team Section -->
-<section class="section team-section">
-  <div class="container">
-    <h2 class="section-title">Notre Équipe</h2>
-    <p class="section-subtitle">
+<section class="py-24">
+  <div class="container mx-auto px-6">
+    <h2
+      class="text-4xl md:text-5xl font-extrabold text-blue-primary text-center mb-4"
+    >
+      Notre Équipe
+    </h2>
+    <p class="text-xl text-center text-gray-600 max-w-2xl mx-auto mb-16">
       Des professionnels passionnés à votre service
     </p>
 
-    <div class="team-grid">
-      <div class="team-member">
-        <div class="member-image">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto"
+    >
+      <div class="text-center">
+        <div
+          class="w-60 h-60 mx-auto mb-8 rounded-3xl overflow-hidden relative group"
+        >
           <img
             src="/assets/images/pexels-photo-3806288.jpeg"
             alt="Mécanicien"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
-        <h3>Jean Dupont</h3>
-        <p>Chef Mécanicien</p>
+        <h3 class="text-2xl font-bold text-blue-primary mb-2">Jean Dupont</h3>
+        <p class="text-gray-600 text-lg">Chef Mécanicien</p>
       </div>
 
-      <div class="team-member">
-        <div class="member-image">
+      <div class="text-center">
+        <div
+          class="w-60 h-60 mx-auto mb-8 rounded-3xl overflow-hidden relative group"
+        >
           <img
             src="/assets/images/pexels-photo-4489773.webp"
             alt="Mécanicien"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
-        <h3>Marie Martin</h3>
-        <p>Spécialiste Diagnostic</p>
+        <h3 class="text-2xl font-bold text-blue-primary mb-2">Marie Martin</h3>
+        <p class="text-gray-600 text-lg">Spécialiste Diagnostic</p>
       </div>
 
-      <div class="team-member">
-        <div class="member-image">
+      <div class="text-center">
+        <div
+          class="w-60 h-60 mx-auto mb-8 rounded-3xl overflow-hidden relative group"
+        >
           <img
             src="/assets/images/pexels-tiger-lily-4484078.jpg"
             alt="Mécanicien"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
-        <h3>Pierre Dubois</h3>
-        <p>Expert Électronique</p>
+        <h3 class="text-2xl font-bold text-blue-primary mb-2">Pierre Dubois</h3>
+        <p class="text-gray-600 text-lg">Expert Électronique</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Footer -->
-<footer class="footer" style="background-color: var(--primary-color)">
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Contact</h3>
-        <p><i class="fas fa-phone"></i> 01 23 45 67 89</p>
-        <p><i class="fas fa-envelope"></i> {{ "contact@mongarage.fr" }}</p>
-        <p>
-          <i class="fas fa-map-marker-alt"></i> 123 Rue du Garage, 75000 Paris
-        </p>
+<footer class="bg-blue-primary text-white pt-24 pb-6 rounded-t-3xl mt-10">
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
+      <div>
+        <h3 class="text-2xl font-bold mb-6">Contact</h3>
+        <div class="space-y-4">
+          <p class="flex items-center">
+            <i class="fas fa-phone mr-4"></i> 01 23 45 67 89
+          </p>
+          <p class="flex items-center">
+            <i class="fas fa-envelope mr-4"></i>{{ " contact@mongarage.fr" }}
+          </p>
+          <p class="flex items-center">
+            <i class="fas fa-map-marker-alt mr-4"></i> 123 Rue du Garage, 75000
+            Paris
+          </p>
+        </div>
       </div>
 
-      <div class="footer-section">
-        <h3>Horaires</h3>
-        <p>Lundi - Vendredi: 8h - 18h</p>
-        <p>Samedi: 9h - 12h</p>
-        <p>Dimanche: Fermé</p>
+      <div>
+        <h3 class="text-2xl font-bold mb-6">Horaires</h3>
+        <div class="space-y-4">
+          <p>Lundi - Vendredi: 8h - 18h</p>
+          <p>Samedi: 9h - 12h</p>
+          <p>Dimanche: Fermé</p>
+        </div>
       </div>
 
-      <div class="footer-section">
-        <h3>Suivez-nous</h3>
-        <div class="social-links">
-          <a class="flex justify-center items-center" href="#"
-            ><i class="fab fa-facebook"></i
-          ></a>
-          <a class="flex justify-center items-center" href="#"
-            ><i class="fab fa-instagram"></i
-          ></a>
-          <a class="flex justify-center items-center" href="#"
-            ><i class="fab fa-linkedin"></i
-          ></a>
+      <div>
+        <h3 class="text-2xl font-bold mb-6">Suivez-nous</h3>
+        <div class="flex gap-4">
+          <a
+            href="#"
+            class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors duration-300"
+          >
+            <i class="fab fa-facebook-f text-xl"></i>
+          </a>
+          <a
+            href="#"
+            class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors duration-300"
+          >
+            <i class="fab fa-instagram text-xl"></i>
+          </a>
+          <a
+            href="#"
+            class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors duration-300"
+          >
+            <i class="fab fa-linkedin-in text-xl"></i>
+          </a>
         </div>
       </div>
     </div>
 
-    <div class="footer-bottom text-sm">
-      <p>
+    <div class="text-center pt-8 border-t border-white/10">
+      <p class="text-sm opacity-80">
         &copy; 2025 RAKOTONIRINA Tiavina Irintsoa Nancyah & RAZAFINJAKA Ralph
         Yoan. Tous droits réservés.
       </p>
