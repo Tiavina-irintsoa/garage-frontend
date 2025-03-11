@@ -1,0 +1,178 @@
+<div
+  class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+>
+  <div class="max-w-2xl w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-blue-primary">
+        Créer un compte
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Ou
+        <a
+          routerLink="/auth/login"
+          class="font-medium text-blue-primary hover:text-blue-800"
+        >
+          connectez-vous à votre compte
+        </a>
+      </p>
+    </div>
+
+    <!-- Sélection du rôle -->
+    <div class="space-y-4">
+      <label class="block text-xl font-semibold text-blue-primary text-center">
+        Qui êtes-vous ?
+      </label>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div
+          class="relative cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
+          [class.role-selected]="selectedRole === UserRole.CLIENT"
+          (click)="selectRole(UserRole.CLIENT)"
+        >
+          <img
+            src="/assets/images/client.jpg"
+            alt="Client"
+            class="w-full h-48 object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4"
+          >
+            <div class="text-white">
+              <h3 class="text-xl font-bold mb-1">Client</h3>
+              <p class="text-sm opacity-90">Je cherche un service automobile</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="relative cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
+          [class.role-selected]="selectedRole === UserRole.MECANICIEN"
+          (click)="selectRole(UserRole.MECANICIEN)"
+        >
+          <img
+            src="/assets/images/mechanic.png"
+            alt="Mécanicien"
+            class="w-full h-48 object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4"
+          >
+            <div class="text-white">
+              <h3 class="text-xl font-bold mb-1">Mécanicien</h3>
+              <p class="text-sm opacity-90">
+                Je suis un professionnel automobile
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form
+      class="mt-8 space-y-6"
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <!-- Message d'erreur -->
+      <div
+        *ngIf="errorMessage"
+        class="bg-red-50 text-red-500 p-4 rounded-lg text-sm"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="prenom" class="block text-sm font-medium text-gray-700">
+            Prénom
+          </label>
+          <input
+            id="prenom"
+            type="text"
+            formControlName="prenom"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent"
+            [class.border-red-500]="
+              registerForm.get('prenom')?.invalid &&
+              registerForm.get('prenom')?.touched
+            "
+          />
+        </div>
+
+        <div>
+          <label for="nom" class="block text-sm font-medium text-gray-700">
+            Nom
+          </label>
+          <input
+            id="nom"
+            type="text"
+            formControlName="nom"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent"
+            [class.border-red-500]="
+              registerForm.get('nom')?.invalid &&
+              registerForm.get('nom')?.touched
+            "
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent"
+          [class.border-red-500]="
+            registerForm.get('email')?.invalid &&
+            registerForm.get('email')?.touched
+          "
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          Mot de passe
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent"
+          [class.border-red-500]="
+            registerForm.get('password')?.invalid &&
+            registerForm.get('password')?.touched
+          "
+        />
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          [disabled]="registerForm.invalid || isLoading || !selectedRole"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-4xl shadow-sm text-sm font-medium text-blue-primary bg-blue-secondary hover:bg-blue-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isLoading">S'inscrire</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Chargement...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
