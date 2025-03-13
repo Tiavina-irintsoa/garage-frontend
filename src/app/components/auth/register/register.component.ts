@@ -23,8 +23,6 @@ export class RegisterComponent {
   isLoading: boolean = false;
   isRegistered: boolean = false;
   registeredEmail: string = '';
-  selectedRole: UserRole | null = null;
-  UserRole = UserRole;
 
   constructor(
     private fb: FormBuilder,
@@ -36,18 +34,12 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
-      role: ['', Validators.required],
+      role: ['CLIENT'],
     });
   }
 
-  selectRole(role: UserRole): void {
-    console.log(role);
-    this.selectedRole = role;
-    this.registerForm.patchValue({ role });
-  }
-
   onSubmit(): void {
-    if (this.registerForm.valid && this.selectedRole) {
+    if (this.registerForm.valid) {
       this.isLoading = true;
       this.errorMessage = '';
 

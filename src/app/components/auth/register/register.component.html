@@ -1,5 +1,5 @@
 <div
-  class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+  class="mt-10 min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
 >
   <div class="max-w-2xl w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
     <div>
@@ -18,54 +18,6 @@
     </div>
 
     <!-- Sélection du rôle -->
-    <div class="space-y-4">
-      <label class="block text-xl font-semibold text-blue-primary text-center">
-        Qui êtes-vous ?
-      </label>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div
-          class="relative cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
-          [class.role-selected]="selectedRole === UserRole.CLIENT"
-          (click)="selectRole(UserRole.CLIENT)"
-        >
-          <img
-            src="/assets/images/client.jpg"
-            alt="Client"
-            class="w-full h-48 object-cover"
-          />
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4"
-          >
-            <div class="text-white">
-              <h3 class="text-xl font-bold mb-1">Client</h3>
-              <p class="text-sm opacity-90">Je cherche un service automobile</p>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="relative cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
-          [class.role-selected]="selectedRole === UserRole.MECANICIEN"
-          (click)="selectRole(UserRole.MECANICIEN)"
-        >
-          <img
-            src="/assets/images/mechanic.png"
-            alt="Mécanicien"
-            class="w-full h-48 object-cover"
-          />
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4"
-          >
-            <div class="text-white">
-              <h3 class="text-xl font-bold mb-1">Mécanicien</h3>
-              <p class="text-sm opacity-90">
-                Je suis un professionnel automobile
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <form
       class="mt-8 space-y-6"
@@ -149,7 +101,7 @@
       <div>
         <button
           type="submit"
-          [disabled]="registerForm.invalid || isLoading || !selectedRole"
+          [disabled]="registerForm.invalid || isLoading"
           class="w-full flex justify-center py-3 px-4 border border-transparent rounded-4xl shadow-sm text-sm font-medium text-blue-primary bg-blue-secondary hover:bg-blue-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span *ngIf="!isLoading">S'inscrire</span>

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -20,17 +20,22 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
+  private platformId = inject(PLATFORM_ID);
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
-    localStorage.setItem('test-key', 'test-value');
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+
+    // Vérifier si nous sommes dans le navigateur avant d'accéder à localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('test-key', 'test-value');
+    }
   }
 
   onSubmit(): void {
@@ -41,7 +46,7 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.router.navigate(['/']); // Redirection vers la page d'accueil
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
