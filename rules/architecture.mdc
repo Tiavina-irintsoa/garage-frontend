@@ -1,3 +1,8 @@
+---
+description: l
+globs: 
+alwaysApply: true
+---
 mon architecture est très simple
 dans src on aura plusieurs  dossier qui contienderons les modules associés
 -components/
@@ -15,8 +20,15 @@ on aura dans ce dossier
 -member/
 -shared/
 
+util
+
 bien sur s'il y a des parties qui n'ont pas besoin
 de cette séparation, pas besoin de le mettre
 
 J'utilise typescript et non javascript donc il faut
 que tout soit typé
+
+utilise le .env pour les constante global et autres
+Prend en compte que le SSR est activé par défaut et qu'il faut donc activer des verifications pour les APIS du navigateur
+
+
