@@ -1,0 +1,160 @@
+<form [formGroup]="vehiculeForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <div *ngIf="isLoading" class="flex justify-center">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-primary"
+    ></div>
+  </div>
+
+  <div *ngIf="error" class="bg-red-50 text-red-600 p-4 rounded-lg">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!isLoading && !error">
+    <!-- Marque -->
+    <div class="space-y-2">
+      <label for="marque" class="block text-sm font-medium text-gray-700">
+        Marque du véhicule
+      </label>
+      <input
+        type="text"
+        id="marque"
+        list="marques-list"
+        formControlName="marqueLibelle"
+        (input)="onMarqueInput($event)"
+        (change)="onMarqueInput($event)"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        [class.border-red-500]="
+          vehiculeForm.get('marque')?.invalid &&
+          vehiculeForm.get('marque')?.touched
+        "
+      />
+      <datalist id="marques-list">
+        <option
+          *ngFor="let marque of marques"
+          [value]="marque.libelle"
+          [attr.data-id]="marque.id"
+        >
+          {{ marque.libelle }}
+        </option>
+      </datalist>
+    </div>
+
+    <!-- Modèle -->
+    <div class="space-y-2">
+      <label for="modele" class="block text-sm font-medium text-gray-700">
+        Modèle
+      </label>
+      <input
+        type="text"
+        id="modele"
+        list="modeles-list"
+        formControlName="modeleLibelle"
+        (input)="onModeleInput($event)"
+        (change)="onModeleInput($event)"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        [class.border-red-500]="
+          vehiculeForm.get('modele')?.invalid &&
+          vehiculeForm.get('modele')?.touched
+        "
+      />
+      <datalist id="modeles-list">
+        <option
+          *ngFor="let modele of modeles"
+          [value]="modele.libelle"
+          [attr.data-id]="modele.id"
+        >
+          {{ modele.libelle }}
+        </option>
+      </datalist>
+    </div>
+
+    <!-- Couleur -->
+    <div class="space-y-2">
+      <label for="couleur" class="block text-sm font-medium text-gray-700">
+        Couleur
+      </label>
+      <input
+        type="color"
+        id="couleur"
+        formControlName="couleur"
+        class="bg-gray-50 border h-12 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      />
+    </div>
+
+    <!-- Type de véhicule -->
+    <div class="space-y-2">
+      <label for="type" class="block text-sm font-medium text-gray-700">
+        Type de véhicule
+      </label>
+      <select
+        id="type"
+        formControlName="type"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        [class.border-red-500]="
+          vehiculeForm.get('type')?.invalid && vehiculeForm.get('type')?.touched
+        "
+      >
+        <option value="">Sélectionnez un type</option>
+        <option *ngFor="let type of typesVehicules" [value]="type.id">
+          {{ type.libelle }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Immatriculation -->
+    <div class="space-y-2">
+      <label
+        for="immatriculation"
+        class="block text-sm font-medium text-gray-700"
+      >
+        Immatriculation
+      </label>
+      <input
+        type="text"
+        id="immatriculation"
+        formControlName="immatriculation"
+        placeholder="AB-123-CD"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        [class.border-red-500]="
+          vehiculeForm.get('immatriculation')?.invalid &&
+          vehiculeForm.get('immatriculation')?.touched
+        "
+      />
+      <p
+        *ngIf="
+          vehiculeForm.get('immatriculation')?.invalid &&
+          vehiculeForm.get('immatriculation')?.touched
+        "
+        class="text-red-500 text-sm"
+      >
+        Format invalide (ex: AB-123-CD)
+      </p>
+    </div>
+
+    <!-- État du véhicule -->
+    <div class="space-y-2">
+      <label for="etatVehicule" class="block text-sm font-medium text-gray-700">
+        État du véhicule
+      </label>
+      <select
+        id="etatVehicule"
+        formControlName="etatVehicule"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option *ngFor="let etat of etatsVehicule" [value]="etat.value">
+          {{ etat.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="flex justify-end pt-4">
+      <button
+        type="submit"
+        [disabled]="!vehiculeForm.valid"
+        class="px-4 py-2 bg-blue-primary text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Suivant
+      </button>
+    </div>
+  </div>
+</form>

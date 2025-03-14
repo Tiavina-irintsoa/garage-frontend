@@ -1,0 +1,78 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="mb-8">
+    <h2 class="text-2xl font-bold text-blue-primary mb-4">
+      Nouvelle demande de service
+    </h2>
+
+    <!-- Stepper -->
+    <div class="flex justify-between mb-8">
+      <div
+        *ngFor="let step of steps; let i = index"
+        class="flex items-center"
+        [class.text-blue-primary]="i + 1 === currentStep"
+        [class.text-gray-400]="i + 1 !== currentStep"
+      >
+        <div class="flex items-center">
+          <div
+            [class]="
+              'w-8 h-8 rounded-full flex items-center justify-center ' +
+              (step.completed
+                ? 'bg-green-500 text-white'
+                : i + 1 === currentStep
+                ? 'bg-blue-primary text-white'
+                : 'bg-gray-200')
+            "
+          >
+            {{ i + 1 }}
+          </div>
+          <div class="ml-2">{{ step.title }}</div>
+        </div>
+        <div
+          *ngIf="i < steps.length - 1"
+          class="w-12 h-1 mx-2"
+          [class.bg-blue-primary]="i + 1 < currentStep"
+          [class.bg-gray-200]="i + 1 >= currentStep"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Formulaires des étapes -->
+    <div [ngSwitch]="currentStep">
+      <app-vehicule-form
+        *ngSwitchCase="1"
+        (stepComplete)="onStepComplete($event)"
+      >
+      </app-vehicule-form>
+
+      <app-services-form
+        *ngSwitchCase="2"
+        (stepComplete)="onStepComplete($event)"
+      >
+      </app-services-form>
+
+      <app-description-form
+        *ngSwitchCase="3"
+        (stepComplete)="onStepComplete($event)"
+      >
+      </app-description-form>
+
+      <app-rendez-vous-form
+        *ngSwitchCase="4"
+        (stepComplete)="onStepComplete($event)"
+      >
+      </app-rendez-vous-form>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between mt-8">
+      <button
+        *ngIf="currentStep > 1"
+        (click)="previousStep()"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+      >
+        Précédent
+      </button>
+      <div></div>
+    </div>
+  </div>
+</div>

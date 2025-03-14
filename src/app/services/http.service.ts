@@ -1,17 +1,32 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { catchError } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
   private readonly apiUrl = environment.apiUrl;
+  private platformId = inject(PLATFORM_ID);
 
   constructor(private http: HttpClient, private router: Router) {}
+
+  // Méthodes utilitaires pour localStorage
+  private getToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    return localStorage.getItem('token');
+  }
+
+  private getAuthHeaders(token: string): HttpHeaders {
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
 
   // Requêtes publiques (sans token)
   public get<T>(endpoint: string): Observable<T> {
@@ -32,7 +47,11 @@ export class HttpService {
 
   // Requêtes authentifiées (avec token)
   public authenticatedGet<T>(endpoint: string): Observable<T> {
-    const token = localStorage.getItem('token');
+    if (!isPlatformBrowser(this.platformId)) {
+      return throwError(() => new Error('Non disponible côté serveur'));
+    }
+
+    const token = this.getToken();
     if (!token) {
       this.router.navigate(['/auth/login']);
       return throwError(() => new Error('Token non trouvé'));
@@ -53,7 +72,11 @@ export class HttpService {
   }
 
   public authenticatedPost<T>(endpoint: string, data: any): Observable<T> {
-    const token = localStorage.getItem('token');
+    if (!isPlatformBrowser(this.platformId)) {
+      return throwError(() => new Error('Non disponible côté serveur'));
+    }
+
+    const token = this.getToken();
     if (!token) {
       this.router.navigate(['/auth/login']);
       return throwError(() => new Error('Token non trouvé'));
@@ -74,7 +97,11 @@ export class HttpService {
   }
 
   public authenticatedPut<T>(endpoint: string, data: any): Observable<T> {
-    const token = localStorage.getItem('token');
+    if (!isPlatformBrowser(this.platformId)) {
+      return throwError(() => new Error('Non disponible côté serveur'));
+    }
+
+    const token = this.getToken();
     if (!token) {
       this.router.navigate(['/auth/login']);
       return throwError(() => new Error('Token non trouvé'));
@@ -95,7 +122,11 @@ export class HttpService {
   }
 
   public authenticatedDelete<T>(endpoint: string): Observable<T> {
-    const token = localStorage.getItem('token');
+    if (!isPlatformBrowser(this.platformId)) {
+      return throwError(() => new Error('Non disponible côté serveur'));
+    }
+
+    const token = this.getToken();
     if (!token) {
       this.router.navigate(['/auth/login']);
       return throwError(() => new Error('Token non trouvé'));
@@ -113,12 +144,5 @@ export class HttpService {
           return throwError(() => error);
         })
       );
-  }
-
-  private getAuthHeaders(token: string): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
   }
 }
