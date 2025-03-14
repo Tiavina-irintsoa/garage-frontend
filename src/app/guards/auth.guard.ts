@@ -21,6 +21,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   return authService.currentUser$.pipe(
     map((user) => {
+      console.log('User:', user);
       if (!user) {
         router.navigate(['/auth/login']);
         return false;

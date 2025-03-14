@@ -20,7 +20,7 @@ export class AppComponent {
       .subscribe((event: any) => {
         console.log(event.url);
         // Ne pas afficher la navbar sur les routes commençant par /dashboard
-        this.showNavbar = !event.url.startsWith('/dashboard');
+        this.showNavbar = !event.url.startsWith('/BO');
         console.log(this.showNavbar);
       });
   }

@@ -31,11 +31,6 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
-
-    // Vérifier si nous sommes dans le navigateur avant d'accéder à localStorage
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('test-key', 'test-value');
-    }
   }
 
   onSubmit(): void {
