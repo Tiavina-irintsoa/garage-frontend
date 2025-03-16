@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { VehiculeFormComponent } from './steps/vehicule-form/vehicule-form.component';
@@ -23,6 +23,12 @@ import { DemandeFormData } from '../../../../models/demande.interface';
   styleUrls: ['./nouvelle-demande.component.css'],
 })
 export class NouvelleDemandComponent implements OnInit {
+  @ViewChild(VehiculeFormComponent) vehiculeForm!: VehiculeFormComponent;
+  @ViewChild(ServicesFormComponent) servicesForm!: ServicesFormComponent;
+  @ViewChild(DescriptionFormComponent)
+  descriptionForm!: DescriptionFormComponent;
+  @ViewChild(RendezVousFormComponent) rendezVousForm!: RendezVousFormComponent;
+
   currentStep: number = 1;
   totalSteps: number = 4;
   formData: DemandeFormData = {};
@@ -47,8 +53,9 @@ export class NouvelleDemandComponent implements OnInit {
   }
 
   nextStep(): void {
-    if (this.currentStep < this.totalSteps) {
-      this.currentStep++;
+    const currentForm = this.getCurrentForm();
+    if (currentForm) {
+      currentForm.onSubmit();
     }
   }
 
@@ -79,7 +86,22 @@ export class NouvelleDemandComponent implements OnInit {
 
     this.steps[this.currentStep - 1].completed = true;
     if (this.currentStep < this.totalSteps) {
-      this.nextStep();
+      this.currentStep++;
+    }
+  }
+
+  private getCurrentForm(): any {
+    switch (this.currentStep) {
+      case 1:
+        return this.vehiculeForm;
+      case 2:
+        return this.servicesForm;
+      case 3:
+        return this.descriptionForm;
+      case 4:
+        return this.rendezVousForm;
+      default:
+        return null;
     }
   }
 }
