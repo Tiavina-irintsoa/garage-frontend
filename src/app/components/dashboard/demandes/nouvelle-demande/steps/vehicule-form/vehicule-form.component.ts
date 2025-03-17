@@ -26,6 +26,8 @@ import { NouvelleDemandService } from '../../../../../../services/nouvelle-deman
 export class VehiculeFormComponent implements OnInit {
   @Output() stepComplete = new EventEmitter<any>();
   @Input() initialData?: Vehicule;
+  @Input() currentStep: number = 1;
+  @Output() previousStep = new EventEmitter<void>();
 
   vehiculeForm!: FormGroup;
   marques: Marque[] = [];
@@ -46,10 +48,10 @@ export class VehiculeFormComponent implements OnInit {
     private nouvelleDemandService: NouvelleDemandService
   ) {
     this.vehiculeForm = this.fb.group({
-      marque: ['', Validators.required],
+      marque: [''],
       marqueLibelle: ['', Validators.required],
-      modele: ['', Validators.required],
-      modeleLibelle: ['', Validators.required],
+      modele: [''],
+      modeleLibelle: [''],
       couleur: ['#000000', Validators.required],
       type: ['', Validators.required],
       immatriculation: [
@@ -63,9 +65,20 @@ export class VehiculeFormComponent implements OnInit {
     });
 
     // Écouter les changements de marque pour charger les modèles
-    this.vehiculeForm.get('marque')?.valueChanges.subscribe((marqueId) => {
-      if (marqueId) {
-        this.loadModeles(marqueId);
+    this.vehiculeForm.get('marqueLibelle')?.valueChanges.subscribe((value) => {
+      if (!value) {
+        this.vehiculeForm.patchValue({
+          marque: '',
+          modele: '',
+          modeleLibelle: '',
+        });
+        this.modeles = [];
+      }
+    });
+
+    this.vehiculeForm.get('modeleLibelle')?.valueChanges.subscribe((value) => {
+      if (!value) {
+        this.vehiculeForm.patchValue({ modele: '' });
       }
     });
   }
@@ -136,15 +149,24 @@ export class VehiculeFormComponent implements OnInit {
       const selectedMarque = this.marques.find(
         (m) => m.libelle === formValue.marqueLibelle
       );
-      const selectedModele = this.modeles.find(
-        (m) => m.libelle === formValue.modeleLibelle
-      );
       const selectedType = this.typesVehicules.find(
         (t) => t.id === formValue.type
       );
 
       if (!selectedMarque || !selectedType) {
         this.error = 'Veuillez sélectionner une marque et un type valides';
+        if (!selectedMarque) {
+          this.vehiculeForm.get('marqueLibelle')?.setErrors({ invalid: true });
+        }
+        if (!selectedType) {
+          this.vehiculeForm.get('type')?.setErrors({ invalid: true });
+        }
+        return;
+      }
+
+      if (!formValue.modeleLibelle.trim()) {
+        this.error = 'Veuillez entrer un modèle';
+        this.vehiculeForm.get('modeleLibelle')?.setErrors({ required: true });
         return;
       }
 
@@ -154,7 +176,7 @@ export class VehiculeFormComponent implements OnInit {
           libelle: selectedMarque.libelle,
         },
         modele: {
-          id: selectedModele?.id || '',
+          id: formValue.modele || '',
           libelle: formValue.modeleLibelle,
         },
         couleur: formValue.couleur,
@@ -162,6 +184,7 @@ export class VehiculeFormComponent implements OnInit {
         immatriculation: formValue.immatriculation,
         etatVehicule: formValue.etatVehicule,
       };
+      this.error = null;
       this.stepComplete.emit(vehiculeData);
     }
   }
@@ -175,17 +198,42 @@ export class VehiculeFormComponent implements OnInit {
         marqueLibelle: selectedMarque.libelle,
       });
       this.loadModeles(selectedMarque.id);
+      this.vehiculeForm.get('marqueLibelle')?.setErrors(null);
+    } else {
+      this.vehiculeForm.patchValue({ marque: '' });
+      if (input.value) {
+        this.vehiculeForm.get('marqueLibelle')?.setErrors({ invalid: true });
+      }
     }
   }
 
   onModeleInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const selectedModele = this.modeles.find((m) => m.libelle === input.value);
-    if (selectedModele) {
+
+    // Si c'est un nouveau modèle (pas dans la liste), on accepte la valeur
+    if (input.value && !selectedModele) {
+      this.vehiculeForm.patchValue({
+        modele: '',
+        modeleLibelle: input.value,
+      });
+      this.vehiculeForm.get('modeleLibelle')?.setErrors(null);
+    }
+    // Si c'est un modèle existant
+    else if (selectedModele) {
       this.vehiculeForm.patchValue({
         modele: selectedModele.id,
         modeleLibelle: selectedModele.libelle,
       });
+      this.vehiculeForm.get('modeleLibelle')?.setErrors(null);
     }
+    // Si le champ est vide
+    else {
+      this.vehiculeForm.patchValue({ modele: '' });
+    }
+  }
+
+  onPreviousStep(): void {
+    this.previousStep.emit();
   }
 }

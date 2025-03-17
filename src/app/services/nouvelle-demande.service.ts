@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Vehicule, Service } from '../models/demande.interface';
+import { Vehicule, DemandeService as Service } from '../models/demande.interface';
 
 export interface DemandeFormData {
   vehicule?: Vehicule;

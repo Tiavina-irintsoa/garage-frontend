@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -15,6 +15,8 @@ import {
   styleUrls: ['./rendez-vous-form.component.css'],
 })
 export class RendezVousFormComponent {
+  @Input() currentStep: number = 4;
+  @Output() previousStep = new EventEmitter<void>();
   @Output() stepComplete = new EventEmitter<any>();
 
   rendezVousForm: FormGroup;
@@ -29,5 +31,9 @@ export class RendezVousFormComponent {
     if (this.rendezVousForm.valid) {
       this.stepComplete.emit(this.rendezVousForm.value);
     }
+  }
+
+  onPreviousStep(): void {
+    this.previousStep.emit();
   }
 }

@@ -28,6 +28,15 @@ export interface Vehicule {
   etatVehicule: EtatVehicule;
 }
 
+// Interface pour les images
+export interface ImageDemande {
+  url: string;
+  nom: string;
+  type: string;
+  taille: number;
+  dateUpload: string;
+}
+
 // Interfaces pour les réponses API
 export interface MarquesResponse {
   data: {
@@ -64,9 +73,11 @@ export interface VehiculeFormData {
 }
 
 // Structure pour la demande complète
-export interface Service {
+export interface DemandeService {
   id: string;
   titre: string;
+  description: string;
+  icone: string;
 }
 
 export interface Estimation {
@@ -81,9 +92,11 @@ export interface Estimation {
 export interface Demande {
   id: string;
   vehicule: Vehicule;
-  services: Service[];
+  services: DemandeService[];
   estimation: Estimation;
   description: string;
+  description_html: string; // Contenu HTML enrichi
+  images: ImageDemande[]; // Liste des images associées
   statut: string;
   dateCreation: string;
   date_rdv: string;
@@ -101,8 +114,10 @@ export interface DemandesResponse {
 // Ajout de l'interface pour le formulaire
 export interface DemandeFormData {
   vehicule?: Vehicule;
-  services?: Service[];
+  services?: DemandeService[];
   description?: string;
+  description_html?: string;
+  images?: ImageDemande[];
   date_rdv?: string;
   heure_rdv?: string;
 }

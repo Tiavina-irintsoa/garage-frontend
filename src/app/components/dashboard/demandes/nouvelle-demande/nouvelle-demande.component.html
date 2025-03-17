@@ -41,38 +41,34 @@
       <app-vehicule-form
         *ngSwitchCase="1"
         (stepComplete)="onStepComplete($event)"
+        [currentStep]="currentStep"
+        (previousStep)="previousStep()"
       >
       </app-vehicule-form>
 
       <app-services-form
         *ngSwitchCase="2"
         (stepComplete)="onStepComplete($event)"
+        [currentStep]="currentStep"
+        (previousStep)="previousStep()"
       >
       </app-services-form>
 
       <app-description-form
         *ngSwitchCase="3"
         (stepComplete)="onStepComplete($event)"
+        [currentStep]="currentStep"
+        (previousStep)="previousStep()"
       >
       </app-description-form>
 
       <app-rendez-vous-form
         *ngSwitchCase="4"
         (stepComplete)="onStepComplete($event)"
+        [currentStep]="currentStep"
+        (previousStep)="previousStep()"
       >
       </app-rendez-vous-form>
-    </div>
-
-    <!-- Navigation -->
-    <div class="flex justify-between mt-8">
-      <button
-        *ngIf="currentStep > 1"
-        (click)="previousStep()"
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-      >
-        Précédent
-      </button>
-      <div></div>
     </div>
   </div>
 </div>
