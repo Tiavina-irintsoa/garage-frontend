@@ -59,4 +59,8 @@ export class RegisterComponent {
       });
     }
   }
+
+  onGoogleSignIn(): void {
+    this.authService.initiateGoogleLogin();
+  }
 }
