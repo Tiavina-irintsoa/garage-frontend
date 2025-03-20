@@ -1,0 +1,61 @@
+<div class="flex space-x-4 p-4">
+  <!-- Column: À faire -->
+  <div
+    class="w-1/3 bg-gray-100 p-4 rounded-lg"
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+  >
+    <h2 class="text-lg font-bold mb-4">À faire</h2>
+    <div
+      *ngFor="let appointment of appointments"
+      [ngClass]="{ hidden: appointment.status !== 'todo' }"
+      cdkDrag
+    >
+      <div class="bg-white p-4 mb-4 rounded-lg shadow-md cursor-pointer">
+        <h3 class="font-semibold">{{ appointment.client }}</h3>
+        <p>{{ appointment.car }}</p>
+        <p class="text-sm text-gray-500">{{ appointment.serviceType }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column: En cours -->
+  <div
+    class="w-1/3 bg-gray-100 p-4 rounded-lg"
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+  >
+    <h2 class="text-lg font-bold mb-4">En cours</h2>
+    <div
+      *ngFor="let appointment of appointments"
+      [ngClass]="{ hidden: appointment.status !== 'in-progress' }"
+      cdkDrag
+    >
+      <div class="bg-white p-4 mb-4 rounded-lg shadow-md cursor-pointer">
+        <h3 class="font-semibold">{{ appointment.client }}</h3>
+        <p>{{ appointment.car }}</p>
+        <p class="text-sm text-gray-500">{{ appointment.serviceType }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column: Fait -->
+  <div
+    class="w-1/3 bg-gray-100 p-4 rounded-lg"
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+  >
+    <h2 class="text-lg font-bold mb-4">Fait</h2>
+    <div
+      *ngFor="let appointment of appointments"
+      [ngClass]="{ hidden: appointment.status !== 'done' }"
+      cdkDrag
+    >
+      <div class="bg-white p-4 mb-4 rounded-lg shadow-md cursor-pointer">
+        <h3 class="font-semibold">{{ appointment.client }}</h3>
+        <p>{{ appointment.car }}</p>
+        <p class="text-sm text-gray-500">{{ appointment.serviceType }}</p>
+      </div>
+    </div>
+  </div>
+</div>
