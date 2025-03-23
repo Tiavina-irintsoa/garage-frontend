@@ -31,10 +31,9 @@ export class AuthService {
   constructor(private http: HttpService, private httpClient: HttpClient) {
     if (isPlatformBrowser(this.platformId)) {
       this.checkAuthStatus();
-    }
-    // Check if user is already authenticated
-    const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem('access_token');
     this.isAuthenticatedSubject.next(!!token);
+    }    
   }
 
   private checkAuthStatus(): void {
