@@ -23,7 +23,7 @@ export class RegisterComponent {
     this.auth.register(this.registerData).subscribe({
       next: (response) => {
         // Handle successful registration
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         console.error('Registration failed:', error);

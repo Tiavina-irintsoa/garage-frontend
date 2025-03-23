@@ -1,0 +1,117 @@
+<div
+  class="flex h-screen flex-col border-r bg-white dark:bg-gray-900 transition-all duration-300"
+  [ngClass]="collapsed ? 'w-16' : 'w-64'"
+>
+  <!-- Header with logo -->
+  <div class="flex h-14 items-center border-b px-3 dark:border-gray-800">
+    <div
+      class="flex items-center gap-2"
+      [ngClass]="{'justify-center w-full': collapsed}"s
+    >
+      <div
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600"
+      >
+        <span class="text-sm font-bold text-white">N</span>
+      </div>
+      <span *ngIf="!collapsed" class="text-sm font-semibold dark:text-white"
+        >Navio</span
+      >
+    </div>
+
+    <!-- Collapse/Expand button -->
+    <button
+      *ngIf="!collapsed"
+      class="ml-auto h-8 w-8 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+      (click)="toggleSidebar()"
+    >
+      <span [innerHTML]="getIconTemplate('chevron-left')"></span>
+      <span class="sr-only">Collapse</span>
+    </button>
+
+    <button
+      *ngIf="collapsed"
+      class="absolute right-2 top-3 h-8 w-8 rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+      (click)="toggleSidebar()"
+    >
+      <span [innerHTML]="getIconTemplate('menu')"></span>
+      <span class="sr-only">Expand</span>
+    </button>
+  </div>
+
+  <!-- Navigation items -->
+  <div class="flex-1 overflow-auto py-2">
+    <nav class="grid gap-1 px-2">
+      <a
+        *ngFor="let item of navItems"
+        routerLinkActive="bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all"
+        [ngClass]="{
+          'justify-center p-2': collapsed,
+          'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400':
+            item.active,
+          'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800':
+            !item.active
+        }"
+      >
+        <!-- Icon -->
+        <span
+          class="flex h-5 w-5 items-center justify-center"
+          [ngClass]="{ 'text-purple-600 dark:text-purple-400': item.active }"
+          [innerHTML]="getIconTemplate(item.icon)"
+        >
+        </span>
+
+        <!-- Label -->
+        <span *ngIf="!collapsed" class="flex-1">{{ item.label }}</span>
+
+        <!-- Badge -->
+        <span
+          *ngIf="!collapsed && item.badge"
+          class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-medium text-white"
+        >
+          {{ item.badge }}
+        </span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Footer with premium card -->
+  <div class="mt-auto p-4">
+    <div
+      class="rounded-lg bg-purple-50 dark:bg-purple-900/30 p-4"
+      [ngClass]="{'p-2': collapsed}"
+    >
+      <div
+        class="mb-2 flex items-center justify-between"
+        [ngClass]="{'justify-center': collapsed}"
+      >
+        <span
+          *ngIf="!collapsed"
+          class="text-xs font-medium text-purple-600 dark:text-purple-400"
+          >PREMIUM PLAN</span
+        >
+
+        <!-- Theme toggle button -->
+        <button
+          class="h-8 w-8 rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+          (click)="toggleTheme()"
+        >
+          <span *ngIf="!darkMode" [innerHTML]="getIconTemplate('moon')"></span>
+          <span *ngIf="darkMode" [innerHTML]="getIconTemplate('sun')"></span>
+          <span class="sr-only">Toggle theme</span>
+        </button>
+      </div>
+
+      <ng-container *ngIf="!collapsed">
+        <div class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          My Account
+        </div>
+        <button
+          class="w-full rounded-lg bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-700"
+        >
+          Go Premium
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>

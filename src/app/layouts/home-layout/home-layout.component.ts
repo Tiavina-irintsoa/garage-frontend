@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { NavbarComponent } from '../../components/shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-home-layout',
-  imports: [RouterOutlet,CommonModule],
+  imports: [RouterOutlet, CommonModule, NavbarComponent],
   templateUrl: './home-layout.component.html',
   styleUrl: './home-layout.component.css'
 })

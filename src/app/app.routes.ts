@@ -5,7 +5,7 @@ import { NouvelleDemandComponent } from './components/dashboard/demandes/nouvell
 import { HomeLayoutComponent } from './layouts/home-layout/home-layout.component';
 import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/shared/404/404.component';
-
+import { BoLayoutComponent } from './layouts/bo-layout/bo-layout.component';
 export const routes: Routes = [
   {
     path: '',
@@ -45,12 +45,18 @@ export const routes: Routes = [
   },
   {
     path: 'BO',
-    loadComponent: () =>
-      import('./components/dashboard/dashboard.component').then(
-        (m) => m.DashboardComponent
-      ),
-    canActivate: [authGuard],
+    component: BoLayoutComponent,
+    //TODO: add auth guard
+    //canActivate: [authGuard],
     children: [
+      
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./components/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent
+          ),
+      },
       {
         path: '',
         loadComponent: () =>
@@ -63,13 +69,26 @@ export const routes: Routes = [
         children: [
           {
             path: '',
-            component: MesDemandesComponent,
+            loadComponent: () =>
+              import('./components/dashboard/demandes/mes-demandes/mes-demandes.component').then(
+                (m) => m.MesDemandesComponent
+              ),
           },
           {
             path: 'nouvelle-demande',
-            component: NouvelleDemandComponent,
+            loadComponent: () =>
+              import('./components/dashboard/demandes/nouvelle-demande/nouvelle-demande.component').then(
+                (m) => m.NouvelleDemandComponent
+              ),
           },
         ],
+      },
+      {
+        path: 'kanban',
+        loadComponent: () =>
+          import('./components/kanban/kanban.component').then(
+            (m) => m.KanbanComponent
+          ),
       },
     ],
   },

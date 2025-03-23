@@ -32,7 +32,7 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       this.checkAuthStatus();
       const token = localStorage.getItem('access_token');
-    this.isAuthenticatedSubject.next(!!token);
+      this.isAuthenticatedSubject.next(!!token);
     }    
   }
 
