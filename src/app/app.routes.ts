@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { MesDemandesComponent } from './components/dashboard/demandes/mes-demandes/mes-demandes.component';
 import { NouvelleDemandComponent } from './components/dashboard/demandes/nouvelle-demande/nouvelle-demande.component';
-import { HomeLayoutComponent } from './home-layout/home-layout.component';
+import { HomeLayoutComponent } from './layouts/home-layout/home-layout.component';
 import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/shared/404/404.component';
 
