@@ -41,7 +41,7 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/BO/kanban']);
         },
         error: (error) => {
           this.isLoading = false;
