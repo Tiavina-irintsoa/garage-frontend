@@ -28,7 +28,7 @@ export class UserNavbarComponent implements OnInit {
   navItems: NavItem[] = [
     { icon: 'fas fa-calendar', label: 'Calendar', route: '/calendar' },
     { icon: 'fas fa-chart-bar', label: 'Analytics', route: '/analytics' },
-    { icon: 'fas fa-folder', label: 'Projects', route: '/projects' },
+    { icon: 'fas fa-folder', label: 'Projects', route: '/BO/kanban' },
   ];
 
   constructor(private authService: AuthService) {

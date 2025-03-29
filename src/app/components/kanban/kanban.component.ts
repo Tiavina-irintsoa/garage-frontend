@@ -2,6 +2,19 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
+interface Task {
+  id: string;
+  description: string;
+  completed: boolean;
+}
+
+interface Part {
+  reference: string;
+  description: string;
+  quantity: number;
+  status: 'En stock' | 'En commande' | 'Non disponible';
+}
+
 interface RepairCard {
   id: string;
   clientName: string;
@@ -19,6 +32,28 @@ interface KanbanColumn {
   count: number;
   color: string;
   cards: RepairCard[];
+}
+
+interface KanbanCard {
+  id: string;
+  clientName: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  serviceType: string;
+  carInfo: string;
+  carYear?: number;
+  licensePlate?: string;
+  mileage?: number;
+  description?: string;
+  createdAt: Date;
+  deadline?: Date;
+  status: string;
+  assignedTo?: string;
+  estimatedPrice?: number;
+  images?: string[];
+  tasks?: Task[];
+  requiredParts?: Part[];
+  invoiceUrl?: string;
 }
 
 @Component({
@@ -257,11 +292,50 @@ export class KanbanComponent {
     // Implement add card logic
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | undefined): string {
+    if (!date) return 'Non définie';
     return new Intl.DateTimeFormat('fr-FR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     }).format(date);
+  }
+
+  selectedProject: KanbanCard | null = null;
+
+  openProjectModal(card: RepairCard) {
+    // Convertir RepairCard en KanbanCard avec les informations supplémentaires
+    this.selectedProject = {
+      ...card,
+      clientPhone: '06 12 34 56 78', // À remplacer par les vraies données
+      clientEmail: 'client@example.com',
+      carYear: 2020,
+      licensePlate: card.carInfo.split(' - ')[1],
+      mileage: 45000,
+      description: 'Description détaillée de la réparation...',
+      deadline: new Date(card.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000), // deadline = création + 7 jours
+      images: [
+        'https://example.com/image1.jpg',
+        'https://example.com/image2.jpg'
+      ],
+      tasks: [
+        { id: '1', description: 'Diagnostic initial', completed: true },
+        { id: '2', description: 'Remplacement des pièces', completed: false },
+        { id: '3', description: 'Test final', completed: false }
+      ],
+      requiredParts: [
+        {
+          reference: 'REF001',
+          description: 'Filtre à huile',
+          quantity: 1,
+          status: 'En stock'
+        }
+      ],
+      invoiceUrl: '/factures/2024/FAC-001.pdf'
+    };
+  }
+
+  closeProjectModal() {
+    this.selectedProject = null;
   }
 } 
