@@ -8,5 +8,5 @@ import { UserNavbarComponent } from '../../components/shared/user-navbar/user-na
   styleUrl: './bo-layout.component.css'
 })
 export class BoLayoutComponent {
-
+  currentYear = new Date().getFullYear();
 }
