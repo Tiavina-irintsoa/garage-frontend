@@ -12,4 +12,87 @@
   background-color: #f3f4f6;
   padding: 8px;
   border-radius: 4px;
+}
+
+/* Custom scrollbar styles */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+  border: 2px solid #f3f4f6;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Smooth transitions */
+.kanban-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.kanban-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Column hover effect */
+.kanban-column {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.kanban-column:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Drag and Drop Styles */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  opacity: 0.8;
+  background-color: white;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.invalid-drop-target {
+  border: 2px solid #ef4444;
+}
+
+/* Style pour la zone de drop pendant le survol */
+.cdk-drop-list-dragging .cdk-drop-list-receiving {
+  background-color: #eff6ff;
+  border: 2px solid #bfdbfe;
+  transition: background-color 0.2s ease;
+}
+
+/* Style pour la carte en cours de déplacement */
+.cdk-drag-dragging {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 } 

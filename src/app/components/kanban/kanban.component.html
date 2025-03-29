@@ -1,17 +1,130 @@
-<div class="kanban-container">
-  <h1>Kanban Board</h1>
-  <div class="kanban-board">
-    <div class="kanban-column">
-      <h2>To Do</h2>
-      <!-- Add tasks here -->
+<div class="p-6 flex flex-col h-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center space-x-4">
+      <h1 class="text-2xl font-semibold">Réparations</h1>
+      <span class="text-gray-500">/</span>
+      <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-sm">
+        {{ columns.length }} colonnes
+      </span>
     </div>
-    <div class="kanban-column">
-      <h2>In Progress</h2>
-      <!-- Add tasks here -->
+    <div class="flex items-center space-x-4">
+      
+      <button class="text-gray-600 hover:text-gray-800 p-2">
+        <i class="fas fa-search"></i>
+      </button>
+      <button class="text-gray-600 hover:text-gray-800 p-2">
+        <i class="fas fa-filter"></i>
+      </button>
+      <button class="text-gray-600 hover:text-gray-800 p-2">
+        <i class="fas fa-sort"></i>
+      </button>
     </div>
-    <div class="kanban-column">
-      <h2>Done</h2>
-      <!-- Add tasks here -->
+  </div>
+
+  <!-- Kanban Board Container with top scrollbar -->
+  <div class="flex flex-col">
+    <!-- Scrollable container -->
+    <div class="overflow-x-auto pb-4 mb-4">
+      <div class="flex space-x-4 min-w-max">
+        <div
+          *ngFor="let column of columns"
+          [id]="column.id"
+          [class]="'flex-shrink-0 w-80 rounded-lg ' + column.color"
+        >
+          <!-- Column Header -->
+          <div class="p-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <h3 class="font-medium">{{ column.title }}</h3>
+              <span
+                class="bg-white bg-opacity-50 text-gray-700 px-2 py-0.5 rounded-full text-sm"
+              >
+                {{ column.count }}
+              </span>
+            </div>
+            <button class="text-gray-600 hover:text-gray-800">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+          </div>
+
+          <!-- Cards Container -->
+          <div
+            class="p-2 space-y-2 min-h-[200px]"
+            cdkDropList
+            [cdkDropListData]="column.cards"
+            [id]="column.id"
+            [cdkDropListConnectedTo]="stateTransitions[column.id]"
+            (cdkDropListDropped)="onDrop($event)"
+          >
+            <!-- Cards -->
+            <div
+              *ngFor="let card of column.cards"
+              class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+              cdkDrag
+              [cdkDragData]="card"
+              [class.border-red-500]="!canDrop(column.id, 'target-column')"
+            >
+              <!-- Drag Preview -->
+              <div *cdkDragPreview class="bg-white p-4 rounded-lg shadow-lg">
+                <div class="font-medium">{{ card.clientName }}</div>
+                <div class="text-sm text-gray-600">{{ card.carInfo }}</div>
+              </div>
+
+              <!-- Card Content -->
+              <div class="space-y-2">
+                <!-- Client Name and Date -->
+                <div class="flex items-center justify-between">
+                  <span class="font-medium">{{ card.clientName }}</span>
+                  <span class="text-xs text-gray-500">{{
+                    formatDate(card.createdAt)
+                  }}</span>
+                </div>
+
+                <!-- Service Type Badge -->
+                <div class="flex items-center space-x-2 mb-2">
+                  <span [class]="getServiceTypeBadgeClass(card.serviceType)">
+                    {{ card.serviceType }}
+                  </span>
+                </div>
+
+                <!-- Car Info -->
+                <div class="text-sm text-gray-600">
+                  {{ card.carInfo }}
+                </div>
+
+                <!-- Bottom Section -->
+                <div class="flex items-center justify-between pt-2">
+                  <!-- Assigned To / Price -->
+                  <div class="flex items-center space-x-2">
+                    <span
+                      *ngIf="card.assignedTo"
+                      class="flex items-center text-xs text-gray-500"
+                    >
+                      <i class="fas fa-user-circle mr-1"></i>
+                      {{ card.assignedTo }}
+                    </span>
+                    <span
+                      *ngIf="card.estimatedPrice"
+                      class="flex items-center text-xs text-gray-500"
+                    >
+                      <i class="fas fa-euro-sign mr-1"></i>
+                      {{ card.estimatedPrice }}
+                    </span>
+                  </div>
+
+                  <!-- Action Button -->
+                  <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-ellipsis-v"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Card Button -->
+            
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -36,19 +36,6 @@ export class UserNavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      this.enableDarkMode();
-    }
-    
-    // Check screen size on init
-    this.checkScreenSize();
-    
-    // Listen for window resize
-    window.addEventListener('resize', () => {
-      this.checkScreenSize();
-    });
   }
 
   checkScreenSize(): void {
@@ -61,26 +48,6 @@ export class UserNavbarComponent implements OnInit {
 
   toggleUserMenu(): void {
     this.isUserMenuOpen = !this.isUserMenuOpen;
-  }
-
-  toggleTheme(): void {
-    if (this.darkMode) {
-      this.disableDarkMode();
-    } else {
-      this.enableDarkMode();
-    }
-  }
-
-  enableDarkMode(): void {
-    document.documentElement.classList.add('dark');
-    this.darkMode = true;
-    localStorage.setItem('theme', 'dark');
-  }
-
-  disableDarkMode(): void {
-    document.documentElement.classList.remove('dark');
-    this.darkMode = false;
-    localStorage.setItem('theme', 'light');
   }
 
   onLogout(): void {
