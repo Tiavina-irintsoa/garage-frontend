@@ -1,18 +1,42 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { RepairService, Repair, RepairStatus } from '../../services/repair.service';
+import { HttpClientModule } from '@angular/common/http';
+import { marked } from 'marked';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+}
 
 interface Task {
   id: string;
   description: string;
   completed: boolean;
+  estimatedTime: number;
+  assignedTo: string;
 }
 
 interface Part {
+  id: string;
+  name: string;
   reference: string;
-  description: string;
+  price: number;
   quantity: number;
   status: 'En stock' | 'En commande' | 'Non disponible';
+}
+
+interface Service {
+  id: string;
+  type: 'entretien' | 'réparation' | 'vidange';
+  estimatedDuration: number;
+  estimatedPrice: number;
+  tasks: Task[];
+  requiredParts: Part[];
 }
 
 interface RepairCard {
@@ -20,10 +44,11 @@ interface RepairCard {
   clientName: string;
   carInfo: string;
   createdAt: Date;
-  assignedTo?: string;
+  assignedTeam?: TeamMember[];
   estimatedPrice?: number;
   status: string;
   serviceType: 'entretien' | 'réparation' | 'vidange';
+  services?: Service[];
 }
 
 interface KanbanColumn {
@@ -39,7 +64,6 @@ interface KanbanCard {
   clientName: string;
   clientPhone?: string;
   clientEmail?: string;
-  serviceType: string;
   carInfo: string;
   carYear?: number;
   licensePlate?: string;
@@ -48,164 +72,115 @@ interface KanbanCard {
   createdAt: Date;
   deadline?: Date;
   status: string;
-  assignedTo?: string;
-  estimatedPrice?: number;
+  assignedTeam: TeamMember[];
+  services: Service[];
   images?: string[];
-  tasks?: Task[];
-  requiredParts?: Part[];
   invoiceUrl?: string;
 }
 
 @Component({
   selector: 'app-kanban',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [CommonModule, DragDropModule, HttpClientModule],
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.css']
 })
-export class KanbanComponent {
+export class KanbanComponent implements OnInit {
   columns: KanbanColumn[] = [
     {
-      id: 'waiting-assignment',
+      id: 'ATTENTE_ASSIGNATION',
       title: 'En attente d\'assignation',
-      count: 3,
+      count: 0,
       color: 'bg-yellow-100',
-      cards: [
-        { 
-          id: '1', 
-          clientName: 'Jean Dupont',
-          carInfo: 'Peugeot 208 - AB-123-CD',
-          createdAt: new Date('2024-02-20'),
-          status: 'pending',
-          serviceType: 'vidange'
-        },
-        { 
-          id: '2', 
-          clientName: 'Marie Martin',
-          carInfo: 'Renault Clio - EF-456-GH',
-          createdAt: new Date('2024-02-21'),
-          status: 'pending',
-          serviceType: 'entretien'
-        },
-        { 
-          id: '3', 
-          clientName: 'Pierre Durant',
-          carInfo: 'Citroën C3 - IJ-789-KL',
-          createdAt: new Date('2024-02-22'),
-          status: 'pending',
-          serviceType: 'réparation'
-        }
-      ]
+      cards: []
     },
     {
-      id: 'waiting-invoice',
+      id: 'ATTENTE_FACTURATION',
       title: 'En attente de facturation',
-      count: 2,
+      count: 0,
       color: 'bg-purple-100',
-      cards: [
-        { 
-          id: '6', 
-          clientName: 'Emma Leroy',
-          carInfo: 'Mercedes Classe A - UV-678-WX',
-          createdAt: new Date('2024-02-17'),
-          assignedTo: 'Philippe',
-          estimatedPrice: 450,
-          status: 'to-invoice',
-          serviceType: 'entretien'
-        },
-        { 
-          id: '7', 
-          clientName: 'Antoine Moreau',
-          carInfo: 'Volkswagen Golf - YZ-901-AB',
-          createdAt: new Date('2024-02-16'),
-          assignedTo: 'Laurent',
-          estimatedPrice: 780,
-          status: 'to-invoice',
-          serviceType: 'réparation'
-        }
-      ]
+      cards: []
     },
     {
-      id: 'paid',
+      id: 'PAYE',
       title: 'Payés',
-      count: 1,
+      count: 0,
       color: 'bg-green-100',
-      cards: [
-        { 
-          id: '8', 
-          clientName: 'Julie Dubois',
-          carInfo: 'Ford Fiesta - CD-234-EF',
-          createdAt: new Date('2024-02-15'),
-          assignedTo: 'Michel',
-          estimatedPrice: 350,
-          status: 'paid',
-          serviceType: 'vidange'
-        }
-      ]
+      cards: []
     },
     {
-      id: 'in-progress',
+      id: 'EN_COURS',
       title: 'En cours',
-      count: 2,
+      count: 0,
       color: 'bg-blue-100',
-      cards: [
-        { 
-          id: '4', 
-          clientName: 'Sophie Bernard',
-          carInfo: 'BMW Serie 1 - MN-012-OP',
-          createdAt: new Date('2024-02-19'),
-          assignedTo: 'Michel',
-          status: 'in-progress',
-          serviceType: 'réparation'
-        },
-        { 
-          id: '5', 
-          clientName: 'Lucas Petit',
-          carInfo: 'Audi A3 - QR-345-ST',
-          createdAt: new Date('2024-02-18'),
-          assignedTo: 'Thomas',
-          status: 'in-progress',
-          serviceType: 'entretien'
-        }
-      ]
+      cards: []
     },
     {
-      id: 'completed',
+      id: 'TERMINEE',
       title: 'Terminés',
-      count: 2,
+      count: 0,
       color: 'bg-gray-100',
-      cards: [
-        { 
-          id: '9', 
-          clientName: 'François Roux',
-          carInfo: 'Opel Corsa - GH-567-IJ',
-          createdAt: new Date('2024-02-14'),
-          assignedTo: 'Thomas',
-          estimatedPrice: 620,
-          status: 'completed',
-          serviceType: 'réparation'
-        },
-        { 
-          id: '10', 
-          clientName: 'Catherine Simon',
-          carInfo: 'Toyota Yaris - KL-890-MN',
-          createdAt: new Date('2024-02-13'),
-          assignedTo: 'Laurent',
-          estimatedPrice: 290,
-          status: 'completed',
-          serviceType: 'vidange'
-        }
-      ]
+      cards: []
     }
   ];
 
+  isLoading = true;
+  isLoadingDetails = false;
+
+  constructor(
+    private repairService: RepairService,
+    private sanitizer: DomSanitizer
+  ) {}
+
+  ngOnInit() {
+    this.loadRepairs();
+  }
+
+  private loadRepairs() {
+    this.isLoading = true;
+    const statuses: RepairStatus[] = ['ATTENTE_ASSIGNATION', 'ATTENTE_FACTURATION', 'PAYE', 'EN_COURS', 'TERMINEE'];
+    
+    statuses.forEach(status => {
+      this.repairService.getRepairsByStatus(status).subscribe({
+        next: (repairs) => {
+          const column = this.columns.find(col => col.id === status);
+          if (column) {
+            column.cards = repairs.map(repair => this.mapRepairToCard(repair));
+            column.count = column.cards.length;
+          }
+          // Vérifier si toutes les colonnes sont chargées
+          if (this.columns.every(col => col.cards.length >= 0)) {
+            this.isLoading = false;
+          }
+        },
+        error: (error) => {
+          console.error(`Error loading repairs for status ${status}:`, error);
+          this.isLoading = false;
+        }
+      });
+    });
+  }
+
+  private mapRepairToCard(repair: Repair): RepairCard {
+    return {
+      id: repair.id,
+      clientName: `${repair.user.prenom} ${repair.user.nom}`,
+      carInfo: `${repair.vehicule.marque.libelle} ${repair.vehicule.modele.libelle} - ${repair.vehicule.immatriculation}`,
+      createdAt: new Date(repair.date_rdv),
+      status: repair.reference_paiement ? 'PAYE' : 'ATTENTE_ASSIGNATION',
+      serviceType: 'réparation', // À adapter selon les detailServiceIds
+      estimatedPrice: repair.estimation.cout_estime,
+      services: [] // À remplir avec les détails des services
+    };
+  }
+
   // Définir l'ordre des états et les transitions autorisées
-  stateTransitions: { [key: string]: string[] } = {
-    'waiting-assignment': ['waiting-invoice'],  // Devis initial
-    'waiting-invoice': ['paid', 'waiting-assignment'],  // Peut retourner en attente ou aller au paiement
-    'paid': ['in-progress'],  // Une fois payé, on peut commencer les réparations
-    'in-progress': ['completed'],  // Une fois en cours, on peut terminer
-    'completed': ['in-progress']  // Possibilité de reprendre les réparations si nécessaire
+  stateTransitions: { [key: string]: RepairStatus[] } = {
+    'ATTENTE_ASSIGNATION': ['ATTENTE_FACTURATION'],
+    'ATTENTE_FACTURATION': ['PAYE', 'ATTENTE_ASSIGNATION'],
+    'PAYE': ['EN_COURS'],
+    'EN_COURS': ['TERMINEE'],
+    'TERMINEE': ['EN_COURS']
   };
 
   // Vérifier si le déplacement est valide
@@ -214,7 +189,7 @@ export class KanbanComponent {
     const allowedTransitions = this.stateTransitions[fromColumnId] || [];
     
     // Vérifier si la transition est autorisée
-    return allowedTransitions.includes(toColumnId);
+    return allowedTransitions.includes(toColumnId as RepairStatus);
   }
 
   // Gérer le drop
@@ -226,38 +201,30 @@ export class KanbanComponent {
       const toColumnId = event.container.id;
 
       if (this.isValidMove(fromColumnId, toColumnId)) {
-        // Récupérer la carte qui est déplacée
         const card = event.previousContainer.data[event.previousIndex];
         
-        // Mettre à jour le statut en fonction de la colonne de destination
-        switch (toColumnId) {
-          case 'waiting-assignment':
-            card.status = 'pending';
-            break;
-          case 'in-progress':
-            card.status = 'in-progress';
-            break;
-          case 'waiting-invoice':
-            card.status = 'to-invoice';
-            break;
-          case 'paid':
-            card.status = 'paid';
-            break;
-          case 'completed':
-            card.status = 'completed';
-            break;
-        }
-
-        // Déplacer la carte
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex
-        );
-        
-        // Mettre à jour les compteurs
-        this.updateColumnCounts();
+        // Mettre à jour le statut via l'API
+        this.repairService.updateRepairStatus(card.id, toColumnId as RepairStatus).subscribe({
+          next: (updatedRepair) => {
+            // Mettre à jour le statut localement
+            card.status = toColumnId;
+            
+            // Déplacer la carte
+            transferArrayItem(
+              event.previousContainer.data,
+              event.container.data,
+              event.previousIndex,
+              event.currentIndex
+            );
+            
+            // Mettre à jour les compteurs
+            this.updateColumnCounts();
+          },
+          error: (error) => {
+            console.error('Error updating repair status:', error);
+            // Gérer l'erreur (afficher un message, etc.)
+          }
+        });
       }
     }
   }
@@ -274,7 +241,7 @@ export class KanbanComponent {
     });
   }
 
-  getServiceTypeBadgeClass(serviceType: string): string {
+  getServiceTypeBadgeClass(serviceType: 'entretien' | 'réparation' | 'vidange'): string {
     const baseClasses = 'text-xs px-2 py-1 rounded-full font-medium';
     switch (serviceType) {
       case 'entretien':
@@ -301,41 +268,99 @@ export class KanbanComponent {
     }).format(date);
   }
 
+  formatPrice(price: number | undefined): string {
+    if (!price) return '0';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'MGA'
+    }).format(price);
+  }
+
+  formatMileage(mileage: number | undefined): string {
+    if (!mileage) return '0';
+    return new Intl.NumberFormat('fr-FR').format(mileage) + ' km';
+  }
+
   selectedProject: KanbanCard | null = null;
 
   openProjectModal(card: RepairCard) {
-    // Convertir RepairCard en KanbanCard avec les informations supplémentaires
+    // Afficher immédiatement le modal avec un projet vide pour le skeleton loader
     this.selectedProject = {
-      ...card,
-      clientPhone: '06 12 34 56 78', // À remplacer par les vraies données
-      clientEmail: 'client@example.com',
-      carYear: 2020,
-      licensePlate: card.carInfo.split(' - ')[1],
-      mileage: 45000,
-      description: 'Description détaillée de la réparation...',
-      deadline: new Date(card.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000), // deadline = création + 7 jours
-      images: [
-        'https://example.com/image1.jpg',
-        'https://example.com/image2.jpg'
-      ],
-      tasks: [
-        { id: '1', description: 'Diagnostic initial', completed: true },
-        { id: '2', description: 'Remplacement des pièces', completed: false },
-        { id: '3', description: 'Test final', completed: false }
-      ],
-      requiredParts: [
-        {
-          reference: 'REF001',
-          description: 'Filtre à huile',
-          quantity: 1,
-          status: 'En stock'
-        }
-      ],
-      invoiceUrl: '/factures/2024/FAC-001.pdf'
+      id: card.id,
+      clientName: '',
+      clientPhone: '',
+      clientEmail: '',
+      carInfo: card.carInfo,
+      carYear: undefined,
+      licensePlate: '',
+      mileage: undefined,
+      description: '',
+      createdAt: card.createdAt,
+      deadline: undefined,
+      status: card.status,
+      assignedTeam: [],
+      services: [],
+      images: [],
+      invoiceUrl: undefined
     };
+    this.isLoadingDetails = true;
+
+    // Charger les détails
+    this.repairService.getRepairDetail(card.id).subscribe({
+      next: (response) => {
+        const repair = response.data.demande;
+        
+        // Convertir les services en format attendu par la modal
+        const services: Service[] = repair.services.map(service => ({
+          id: service.id,
+          type: this.mapServiceType(service.titre),
+          estimatedDuration: service.temps_base,
+          estimatedPrice: service.cout_base,
+          tasks: [], // À implémenter quand les tâches seront disponibles
+          requiredParts: [] // À implémenter quand les pièces seront disponibles
+        }));
+
+        this.selectedProject = {
+          id: repair.id,
+          clientName: `${repair.user.prenom} ${repair.user.nom}`,
+          clientPhone: '06 12 34 56 78', // À implémenter quand disponible
+          clientEmail: repair.user.email,
+          carInfo: `${repair.vehicule.marque.libelle} ${repair.vehicule.modele.libelle} - ${repair.vehicule.immatriculation}`,
+          carYear: 2020, // À implémenter quand disponible
+          licensePlate: repair.vehicule.immatriculation,
+          mileage: 50000, // À implémenter quand disponible
+          description: repair.description,
+          createdAt: new Date(repair.dateCreation),
+          deadline: new Date(repair.deadline),
+          status: repair.statut,
+          assignedTeam: [], // À implémenter quand l'équipe sera disponible
+          services: services,
+          images: repair.images,
+          invoiceUrl: repair.reference_paiement ? `https://example.com/factures/${repair.reference_paiement}.pdf` : undefined
+        };
+        this.isLoadingDetails = false;
+      },
+      error: (error) => {
+        console.error('Error loading repair details:', error);
+        this.isLoadingDetails = false;
+      }
+    });
+  }
+
+  private mapServiceType(titre: string): 'entretien' | 'réparation' | 'vidange' {
+    const type = titre.toLowerCase();
+    if (type.includes('vidange')) return 'vidange';
+    if (type.includes('entretien')) return 'entretien';
+    return 'réparation';
   }
 
   closeProjectModal() {
     this.selectedProject = null;
+  }
+
+  formatMarkdown(markdown: string | undefined): SafeHtml {
+    if (!markdown) return '';
+    const html = marked.parse(markdown) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 } 
