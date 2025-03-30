@@ -254,6 +254,14 @@ export class KanbanComponent implements OnInit {
     }).format(date);
   }
 
+  formatPrice(price: number | undefined): string {
+    if (!price) return '0';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'MGA'
+    }).format(price);
+  }
+
   selectedProject: KanbanCard | null = null;
 
   openProjectModal(card: RepairCard) {
