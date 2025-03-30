@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { RepairService, Repair, RepairStatus } from '../../services/repair.service';
+import { HttpClientModule } from '@angular/common/http';
 
 interface TeamMember {
   id: string;
@@ -77,193 +79,94 @@ interface KanbanCard {
 @Component({
   selector: 'app-kanban',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [CommonModule, DragDropModule, HttpClientModule],
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.css']
 })
-export class KanbanComponent {
+export class KanbanComponent implements OnInit {
   columns: KanbanColumn[] = [
     {
-      id: 'waiting-assignment',
+      id: 'ATTENTE_ASSIGNATION',
       title: 'En attente d\'assignation',
-      count: 3,
+      count: 0,
       color: 'bg-yellow-100',
-      cards: [
-        { 
-          id: '1', 
-          clientName: 'Jean Dupont',
-          carInfo: 'Peugeot 208 - AB-123-CD',
-          createdAt: new Date('2024-02-20'),
-          status: 'pending',
-          serviceType: 'vidange',
-          assignedTeam: []
-        },
-        { 
-          id: '2', 
-          clientName: 'Marie Martin',
-          carInfo: 'Renault Clio - EF-456-GH',
-          createdAt: new Date('2024-02-21'),
-          status: 'pending',
-          serviceType: 'entretien',
-          assignedTeam: []
-        },
-        { 
-          id: '3', 
-          clientName: 'Pierre Durant',
-          carInfo: 'Citroën C3 - IJ-789-KL',
-          createdAt: new Date('2024-02-22'),
-          status: 'pending',
-          serviceType: 'réparation',
-          assignedTeam: []
-        }
-      ]
+      cards: []
     },
     {
-      id: 'waiting-invoice',
+      id: 'ATTENTE_FACTURATION',
       title: 'En attente de facturation',
-      count: 2,
+      count: 0,
       color: 'bg-purple-100',
-      cards: [
-        { 
-          id: '6', 
-          clientName: 'Emma Leroy',
-          carInfo: 'Mercedes Classe A - UV-678-WX',
-          createdAt: new Date('2024-02-17'),
-          assignedTeam: [
-            { id: '1', name: 'Philippe', role: 'Mécanicien' }
-          ],
-          estimatedPrice: 450,
-          status: 'to-invoice',
-          serviceType: 'entretien'
-        },
-        { 
-          id: '7', 
-          clientName: 'Antoine Moreau',
-          carInfo: 'Volkswagen Golf - YZ-901-AB',
-          createdAt: new Date('2024-02-16'),
-          assignedTeam: [
-            { id: '2', name: 'Laurent', role: 'Technicien' }
-          ],
-          estimatedPrice: 780,
-          status: 'to-invoice',
-          serviceType: 'réparation'
-        }
-      ]
+      cards: []
     },
     {
-      id: 'paid',
+      id: 'PAYE',
       title: 'Payés',
-      count: 1,
+      count: 0,
       color: 'bg-green-100',
-      cards: [
-        { 
-          id: '8', 
-          clientName: 'Julie Dubois',
-          carInfo: 'Ford Fiesta - CD-234-EF',
-          createdAt: new Date('2024-02-15'),
-          assignedTeam: [
-            { id: '3', name: 'Michel', role: 'Mécanicien' }
-          ],
-          estimatedPrice: 350,
-          status: 'paid',
-          serviceType: 'vidange'
-        }
-      ]
+      cards: []
     },
     {
-      id: 'in-progress',
+      id: 'EN_COURS',
       title: 'En cours',
-      count: 2,
+      count: 0,
       color: 'bg-blue-100',
-      cards: [
-        { 
-          id: '4', 
-          clientName: 'Sophie Bernard',
-          carInfo: 'BMW Serie 1 - MN-012-OP',
-          createdAt: new Date('2024-02-19'),
-          assignedTeam: [
-            { id: '3', name: 'Michel', role: 'Mécanicien principal' },
-            { id: '5', name: 'Sarah', role: 'Assistante mécanicienne' },
-            { id: '6', name: 'Jean', role: 'Expert diagnostic' }
-          ],
-          status: 'in-progress',
-          serviceType: 'réparation',
-          estimatedPrice: 850,
-          services: [
-            {
-              id: '1',
-              type: 'réparation',
-              estimatedDuration: 4,
-              estimatedPrice: 550,
-              tasks: [],
-              requiredParts: []
-            },
-            {
-              id: '2',
-              type: 'entretien',
-              estimatedDuration: 2,
-              estimatedPrice: 300,
-              tasks: [],
-              requiredParts: []
-            }
-          ]
-        },
-        { 
-          id: '5', 
-          clientName: 'Lucas Petit',
-          carInfo: 'Audi A3 - QR-345-ST',
-          createdAt: new Date('2024-02-18'),
-          assignedTeam: [
-            { id: '4', name: 'Thomas', role: 'Technicien' },
-            { id: '7', name: 'Marie', role: 'Spécialiste électronique' }
-          ],
-          status: 'in-progress',
-          serviceType: 'entretien',
-          estimatedPrice: 420
-        }
-      ]
+      cards: []
     },
     {
-      id: 'completed',
+      id: 'TERMINEE',
       title: 'Terminés',
-      count: 2,
+      count: 0,
       color: 'bg-gray-100',
-      cards: [
-        { 
-          id: '9', 
-          clientName: 'François Roux',
-          carInfo: 'Opel Corsa - GH-567-IJ',
-          createdAt: new Date('2024-02-14'),
-          assignedTeam: [
-            { id: '4', name: 'Thomas', role: 'Technicien' }
-          ],
-          estimatedPrice: 620,
-          status: 'completed',
-          serviceType: 'réparation'
-        },
-        { 
-          id: '10', 
-          clientName: 'Catherine Simon',
-          carInfo: 'Toyota Yaris - KL-890-MN',
-          createdAt: new Date('2024-02-13'),
-          assignedTeam: [
-            { id: '2', name: 'Laurent', role: 'Technicien' }
-          ],
-          estimatedPrice: 290,
-          status: 'completed',
-          serviceType: 'vidange'
-        }
-      ]
+      cards: []
     }
   ];
 
+  constructor(private repairService: RepairService) {}
+
+  ngOnInit() {
+    this.loadRepairs();
+  }
+
+  private loadRepairs() {
+    const statuses: RepairStatus[] = ['ATTENTE_ASSIGNATION', 'ATTENTE_FACTURATION', 'PAYE', 'EN_COURS', 'TERMINEE'];
+    
+    statuses.forEach(status => {
+      this.repairService.getRepairsByStatus(status).subscribe({
+        next: (repairs) => {
+          const column = this.columns.find(col => col.id === status);
+          if (column) {
+            column.cards = repairs.map(repair => this.mapRepairToCard(repair));
+            column.count = column.cards.length;
+          }
+        },
+        error: (error) => {
+          console.error(`Error loading repairs for status ${status}:`, error);
+        }
+      });
+    });
+  }
+
+  private mapRepairToCard(repair: Repair): RepairCard {
+    return {
+      id: repair.id,
+      clientName: `${repair.user.prenom} ${repair.user.nom}`,
+      carInfo: `${repair.vehicule.marque.libelle} ${repair.vehicule.modele.libelle} - ${repair.vehicule.immatriculation}`,
+      createdAt: new Date(repair.date_rdv),
+      status: repair.reference_paiement ? 'PAYE' : 'ATTENTE_ASSIGNATION',
+      serviceType: 'réparation', // À adapter selon les detailServiceIds
+      estimatedPrice: repair.estimation.cout_estime,
+      services: [] // À remplir avec les détails des services
+    };
+  }
+
   // Définir l'ordre des états et les transitions autorisées
-  stateTransitions: { [key: string]: string[] } = {
-    'waiting-assignment': ['waiting-invoice'],  // Devis initial
-    'waiting-invoice': ['paid', 'waiting-assignment'],  // Peut retourner en attente ou aller au paiement
-    'paid': ['in-progress'],  // Une fois payé, on peut commencer les réparations
-    'in-progress': ['completed'],  // Une fois en cours, on peut terminer
-    'completed': ['in-progress']  // Possibilité de reprendre les réparations si nécessaire
+  stateTransitions: { [key: string]: RepairStatus[] } = {
+    'ATTENTE_ASSIGNATION': ['ATTENTE_FACTURATION'],
+    'ATTENTE_FACTURATION': ['PAYE', 'ATTENTE_ASSIGNATION'],
+    'PAYE': ['EN_COURS'],
+    'EN_COURS': ['TERMINEE'],
+    'TERMINEE': ['EN_COURS']
   };
 
   // Vérifier si le déplacement est valide
@@ -272,7 +175,7 @@ export class KanbanComponent {
     const allowedTransitions = this.stateTransitions[fromColumnId] || [];
     
     // Vérifier si la transition est autorisée
-    return allowedTransitions.includes(toColumnId);
+    return allowedTransitions.includes(toColumnId as RepairStatus);
   }
 
   // Gérer le drop
@@ -284,38 +187,30 @@ export class KanbanComponent {
       const toColumnId = event.container.id;
 
       if (this.isValidMove(fromColumnId, toColumnId)) {
-        // Récupérer la carte qui est déplacée
         const card = event.previousContainer.data[event.previousIndex];
         
-        // Mettre à jour le statut en fonction de la colonne de destination
-        switch (toColumnId) {
-          case 'waiting-assignment':
-            card.status = 'pending';
-            break;
-          case 'in-progress':
-            card.status = 'in-progress';
-            break;
-          case 'waiting-invoice':
-            card.status = 'to-invoice';
-            break;
-          case 'paid':
-            card.status = 'paid';
-            break;
-          case 'completed':
-            card.status = 'completed';
-            break;
-        }
-
-        // Déplacer la carte
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex
-        );
-        
-        // Mettre à jour les compteurs
-        this.updateColumnCounts();
+        // Mettre à jour le statut via l'API
+        this.repairService.updateRepairStatus(card.id, toColumnId as RepairStatus).subscribe({
+          next: (updatedRepair) => {
+            // Mettre à jour le statut localement
+            card.status = toColumnId;
+            
+            // Déplacer la carte
+            transferArrayItem(
+              event.previousContainer.data,
+              event.container.data,
+              event.previousIndex,
+              event.currentIndex
+            );
+            
+            // Mettre à jour les compteurs
+            this.updateColumnCounts();
+          },
+          error: (error) => {
+            console.error('Error updating repair status:', error);
+            // Gérer l'erreur (afficher un message, etc.)
+          }
+        });
       }
     }
   }
@@ -362,129 +257,7 @@ export class KanbanComponent {
   selectedProject: KanbanCard | null = null;
 
   openProjectModal(card: RepairCard) {
-    // Projet spécial pour la carte avec ID '4' (Sophie Bernard)
-    if (card.id === '4') {
-      this.selectedProject = {
-        id: card.id,
-        clientName: card.clientName,
-        clientPhone: '06 12 34 56 78',
-        clientEmail: 'sophie.bernard@email.com',
-        carInfo: card.carInfo,
-        carYear: 2021,
-        licensePlate: 'MN-012-OP',
-        mileage: 45000,
-        description: 'Réparation complexe nécessitant plusieurs interventions',
-        createdAt: card.createdAt,
-        deadline: new Date(card.createdAt.getTime() + 10 * 24 * 60 * 60 * 1000),
-        status: card.status,
-        assignedTeam: card.assignedTeam || [],
-        services: [
-          {
-            id: '1',
-            type: 'réparation',
-            estimatedDuration: 4,
-            estimatedPrice: 550,
-            tasks: [
-              {
-                id: '1',
-                description: 'Diagnostic système de freinage',
-                completed: true,
-                estimatedTime: 1,
-                assignedTo: 'Jean'
-              },
-              {
-                id: '2',
-                description: 'Remplacement des plaquettes de frein',
-                completed: false,
-                estimatedTime: 2,
-                assignedTo: 'Michel'
-              },
-              {
-                id: '3',
-                description: 'Test et ajustement',
-                completed: false,
-                estimatedTime: 1,
-                assignedTo: 'Sarah'
-              }
-            ],
-            requiredParts: [
-              {
-                id: '1',
-                name: 'Plaquettes de frein avant',
-                reference: 'PF-BMW-123',
-                price: 120,
-                quantity: 1,
-                status: 'En stock'
-              },
-              {
-                id: '2',
-                name: 'Disques de frein',
-                reference: 'DF-BMW-456',
-                price: 180,
-                quantity: 2,
-                status: 'En stock'
-              }
-            ]
-          },
-          {
-            id: '2',
-            type: 'entretien',
-            estimatedDuration: 2,
-            estimatedPrice: 300,
-            tasks: [
-              {
-                id: '4',
-                description: 'Vidange huile moteur',
-                completed: false,
-                estimatedTime: 1,
-                assignedTo: 'Michel'
-              },
-              {
-                id: '5',
-                description: 'Remplacement filtre à air',
-                completed: false,
-                estimatedTime: 0.5,
-                assignedTo: 'Sarah'
-              },
-              {
-                id: '6',
-                description: 'Vérification des niveaux',
-                completed: false,
-                estimatedTime: 0.5,
-                assignedTo: 'Sarah'
-              }
-            ],
-            requiredParts: [
-              {
-                id: '3',
-                name: 'Huile moteur synthétique',
-                reference: 'HM-BMW-789',
-                price: 85,
-                quantity: 5,
-                status: 'En stock'
-              },
-              {
-                id: '4',
-                name: 'Filtre à air',
-                reference: 'FA-BMW-012',
-                price: 35,
-                quantity: 1,
-                status: 'En stock'
-              }
-            ]
-          }
-        ],
-        images: [
-          'https://example.com/bmw-front.jpg',
-          'https://example.com/bmw-brake.jpg',
-          'https://example.com/bmw-engine.jpg'
-        ],
-        invoiceUrl: 'https://example.com/facture-sophie-bernard.pdf'
-      };
-      return;
-    }
-    
-    // Pour les autres cartes, garder le comportement par défaut
+    // Pour l'instant, on utilise des données statiques
     this.selectedProject = {
       id: card.id,
       clientName: card.clientName,
@@ -498,44 +271,39 @@ export class KanbanComponent {
       createdAt: card.createdAt,
       deadline: new Date(card.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000),
       status: card.status,
-      assignedTeam: card.assignedTeam || [],
+      assignedTeam: [
+        { id: '1', name: 'Michel', role: 'Mécanicien principal' },
+        { id: '2', name: 'Sarah', role: 'Assistante mécanicienne' }
+      ],
       services: [
         {
           id: '1',
-          type: 'entretien',
-          estimatedDuration: 2,
-          estimatedPrice: 150,
+          type: 'réparation',
+          estimatedDuration: 4,
+          estimatedPrice: 550,
           tasks: [
             {
               id: '1',
-              description: 'Vérification des niveaux',
-              completed: false,
-              estimatedTime: 0.5,
-              assignedTo: 'Philippe'
+              description: 'Diagnostic système de freinage',
+              completed: true,
+              estimatedTime: 1,
+              assignedTo: 'Jean'
             },
             {
               id: '2',
-              description: 'Changement filtre à huile',
+              description: 'Remplacement des plaquettes de frein',
               completed: false,
-              estimatedTime: 0.5,
-              assignedTo: 'Laurent'
+              estimatedTime: 2,
+              assignedTo: 'Michel'
             }
           ],
           requiredParts: [
             {
               id: '1',
-              name: 'Filtre à huile',
-              reference: 'FH-123',
-              price: 25,
+              name: 'Plaquettes de frein avant',
+              reference: 'PF-BMW-123',
+              price: 120,
               quantity: 1,
-              status: 'En stock'
-            },
-            {
-              id: '2',
-              name: 'Huile moteur',
-              reference: 'HM-456',
-              price: 45,
-              quantity: 5,
               status: 'En stock'
             }
           ]
