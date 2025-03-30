@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { RepairService, Repair, RepairStatus } from '../../services/repair.service';
 import { HttpClientModule } from '@angular/common/http';
+import { marked } from 'marked';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface TeamMember {
   id: string;
@@ -122,13 +124,20 @@ export class KanbanComponent implements OnInit {
     }
   ];
 
-  constructor(private repairService: RepairService) {}
+  isLoading = true;
+  isLoadingDetails = false;
+
+  constructor(
+    private repairService: RepairService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit() {
     this.loadRepairs();
   }
 
   private loadRepairs() {
+    this.isLoading = true;
     const statuses: RepairStatus[] = ['ATTENTE_ASSIGNATION', 'ATTENTE_FACTURATION', 'PAYE', 'EN_COURS', 'TERMINEE'];
     
     statuses.forEach(status => {
@@ -139,9 +148,14 @@ export class KanbanComponent implements OnInit {
             column.cards = repairs.map(repair => this.mapRepairToCard(repair));
             column.count = column.cards.length;
           }
+          // Vérifier si toutes les colonnes sont chargées
+          if (this.columns.every(col => col.cards.length >= 0)) {
+            this.isLoading = false;
+          }
         },
         error: (error) => {
           console.error(`Error loading repairs for status ${status}:`, error);
+          this.isLoading = false;
         }
       });
     });
@@ -262,70 +276,91 @@ export class KanbanComponent implements OnInit {
     }).format(price);
   }
 
+  formatMileage(mileage: number | undefined): string {
+    if (!mileage) return '0';
+    return new Intl.NumberFormat('fr-FR').format(mileage) + ' km';
+  }
+
   selectedProject: KanbanCard | null = null;
 
   openProjectModal(card: RepairCard) {
-    // Pour l'instant, on utilise des données statiques
+    // Afficher immédiatement le modal avec un projet vide pour le skeleton loader
     this.selectedProject = {
       id: card.id,
-      clientName: card.clientName,
-      clientPhone: '06 12 34 56 78',
-      clientEmail: 'client@example.com',
+      clientName: '',
+      clientPhone: '',
+      clientEmail: '',
       carInfo: card.carInfo,
-      carYear: 2020,
-      licensePlate: 'AB-123-CD',
-      mileage: 50000,
-      description: 'Description détaillée de la réparation à effectuer',
+      carYear: undefined,
+      licensePlate: '',
+      mileage: undefined,
+      description: '',
       createdAt: card.createdAt,
-      deadline: new Date(card.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000),
+      deadline: undefined,
       status: card.status,
-      assignedTeam: [
-        { id: '1', name: 'Michel', role: 'Mécanicien principal' },
-        { id: '2', name: 'Sarah', role: 'Assistante mécanicienne' }
-      ],
-      services: [
-        {
-          id: '1',
-          type: 'réparation',
-          estimatedDuration: 4,
-          estimatedPrice: 550,
-          tasks: [
-            {
-              id: '1',
-              description: 'Diagnostic système de freinage',
-              completed: true,
-              estimatedTime: 1,
-              assignedTo: 'Jean'
-            },
-            {
-              id: '2',
-              description: 'Remplacement des plaquettes de frein',
-              completed: false,
-              estimatedTime: 2,
-              assignedTo: 'Michel'
-            }
-          ],
-          requiredParts: [
-            {
-              id: '1',
-              name: 'Plaquettes de frein avant',
-              reference: 'PF-BMW-123',
-              price: 120,
-              quantity: 1,
-              status: 'En stock'
-            }
-          ]
-        }
-      ],
-      images: [
-        'https://example.com/image1.jpg',
-        'https://example.com/image2.jpg'
-      ],
-      invoiceUrl: 'https://example.com/facture.pdf'
+      assignedTeam: [],
+      services: [],
+      images: [],
+      invoiceUrl: undefined
     };
+    this.isLoadingDetails = true;
+
+    // Charger les détails
+    this.repairService.getRepairDetail(card.id).subscribe({
+      next: (response) => {
+        const repair = response.data.demande;
+        
+        // Convertir les services en format attendu par la modal
+        const services: Service[] = repair.services.map(service => ({
+          id: service.id,
+          type: this.mapServiceType(service.titre),
+          estimatedDuration: service.temps_base,
+          estimatedPrice: service.cout_base,
+          tasks: [], // À implémenter quand les tâches seront disponibles
+          requiredParts: [] // À implémenter quand les pièces seront disponibles
+        }));
+
+        this.selectedProject = {
+          id: repair.id,
+          clientName: `${repair.user.prenom} ${repair.user.nom}`,
+          clientPhone: '06 12 34 56 78', // À implémenter quand disponible
+          clientEmail: repair.user.email,
+          carInfo: `${repair.vehicule.marque.libelle} ${repair.vehicule.modele.libelle} - ${repair.vehicule.immatriculation}`,
+          carYear: 2020, // À implémenter quand disponible
+          licensePlate: repair.vehicule.immatriculation,
+          mileage: 50000, // À implémenter quand disponible
+          description: repair.description,
+          createdAt: new Date(repair.dateCreation),
+          deadline: new Date(repair.deadline),
+          status: repair.statut,
+          assignedTeam: [], // À implémenter quand l'équipe sera disponible
+          services: services,
+          images: repair.images,
+          invoiceUrl: repair.reference_paiement ? `https://example.com/factures/${repair.reference_paiement}.pdf` : undefined
+        };
+        this.isLoadingDetails = false;
+      },
+      error: (error) => {
+        console.error('Error loading repair details:', error);
+        this.isLoadingDetails = false;
+      }
+    });
+  }
+
+  private mapServiceType(titre: string): 'entretien' | 'réparation' | 'vidange' {
+    const type = titre.toLowerCase();
+    if (type.includes('vidange')) return 'vidange';
+    if (type.includes('entretien')) return 'entretien';
+    return 'réparation';
   }
 
   closeProjectModal() {
     this.selectedProject = null;
+  }
+
+  formatMarkdown(markdown: string | undefined): SafeHtml {
+    if (!markdown) return '';
+    const html = marked.parse(markdown) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 } 

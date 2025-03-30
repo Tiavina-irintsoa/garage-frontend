@@ -47,6 +47,72 @@ export interface Repair {
   reference_paiement: string;
 }
 
+export interface RepairDetail {
+  id: string;
+  id_personne: string;
+  vehicule: {
+    marque: {
+      id: string;
+      libelle: string;
+    };
+    modele: {
+      id: string;
+      libelle: string;
+    };
+    couleur: string;
+    type: {
+      id: string;
+      libelle: string;
+    };
+    immatriculation: string;
+    etatVehicule: string;
+  };
+  detailServiceIds: string[];
+  estimation: {
+    cout_estime: number;
+    temps_estime: number;
+    details: {
+      facteur_etat: number;
+      coefficient_type: number;
+    };
+  };
+  description: string;
+  date_rdv: string;
+  heure_rdv: string;
+  deadline: string;
+  images: string[];
+  dateCreation: string;
+  statut: RepairStatus;
+  reference_paiement: string;
+  user: {
+    id: string;
+    nom: string;
+    prenom: string;
+    email: string;
+  };
+  services: {
+    id: string;
+    titre: string;
+    description: string;
+    icone: string;
+    tachesParDefaut: any[];
+    cout_base: number;
+    temps_base: number;
+    createdAt: string;
+    updatedAt: string;
+    pieces: any[];
+  }[];
+  taches: any[];
+}
+
+export interface RepairDetailResponse {
+  data: {
+    demande: RepairDetail;
+  };
+  error: null | string;
+  status: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -69,5 +135,9 @@ export class RepairService {
 
   updateRepairStatus(id: string, status: RepairStatus): Observable<Repair> {
     return this.http.patch<Repair>(`${this.apiUrl}/${id}/status`, { status });
+  }
+
+  getRepairDetail(id: string): Observable<RepairDetailResponse> {
+    return this.http.get<RepairDetailResponse>(`${this.apiUrl}/${id}`);
   }
 } 

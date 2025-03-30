@@ -28,6 +28,7 @@
     "@ng-icons/ionicons": "^31.2.0",
     "@tailwindcss/postcss": "^4.0.14",
     "express": "^4.18.2",
+    "marked": "^15.0.7",
     "ngx-toastr": "^19.0.0",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
