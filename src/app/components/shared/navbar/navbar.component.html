@@ -1,0 +1,102 @@
+<nav class="bg-white shadow-lg fixed w-full top-0 left-0 z-50">
+  <div class="container mx-auto px-6">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo -->
+      <a href="#" class="text-2xl font-bold text-blue-primary"> Mon garage </a>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex space-x-8">
+        <a
+          href="#services"
+          class="text-gray-600 hover:text-blue-primary transition-colors duration-300"
+        >
+          Services
+        </a>
+        <a
+          href="#tarifs"
+          class="text-gray-600 hover:text-blue-primary transition-colors duration-300"
+        >
+          Tarifs
+        </a>
+      </div>
+
+      <!-- Login/User Button -->
+      <ng-container *ngIf="currentUser$ | async as user; else loginButton">
+        <div class="relative">
+          <button
+            class="flex items-center space-x-2 text-gray-600 hover:text-blue-primary"
+            (click)="toggleUserMenu()"
+          >
+            <div class="w-8 h-8 rounded-full overflow-hidden">
+              <img
+                [src]="
+                  'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' +
+                  user.email
+                "
+                [alt]="user.prenom + ' ' + user.nom"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <span class="hidden md:block">{{ user.prenom }}</span>
+            <i class="fas fa-chevron-down text-xs ml-1"></i>
+          </button>
+
+          <!-- User Dropdown Menu -->
+          <div
+            *ngIf="isUserMenuOpen"
+            class="absolute right-0 mt-2 bg-white rounded-xl shadow-lg py-2 z-50"
+          >
+            <div class="px-4 py-2 border-b border-gray-100">
+              <p class="text-sm font-medium text-gray-900">
+                {{ user.prenom }} {{ user.nom }}
+              </p>
+              <p class="text-sm text-gray-500">{{ user.email }}</p>
+            </div>
+            <button
+              (click)="onLogout()"
+              class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center"
+            >
+              <i class="fas fa-sign-out-alt mr-2"></i>
+              Se déconnecter
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #loginButton>
+        <button
+          (click)="onLogin()"
+          class="cursor-pointer bg-blue-secondary text-blue-primary px-6 py-2 rounded-4xl text-sm font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+        >
+          Se connecter
+        </button>
+      </ng-template>
+
+      <!-- Mobile Menu Button -->
+      <button
+        class="md:hidden text-gray-600 hover:text-blue-primary"
+        (click)="toggleMobileMenu()"
+      >
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="md:hidden" [class.hidden]="!isMobileMenuOpen">
+      <div class="py-4 space-y-4">
+        <a
+          href="#services"
+          class="block text-gray-600 hover:text-blue-primary transition-colors duration-300"
+        >
+          Services
+        </a>
+        <a
+          href="#tarifs"
+          class="block text-gray-600 hover:text-blue-primary transition-colors duration-300"
+        >
+          Tarifs
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,75 @@
+<div
+  class="flex h-screen fixed z-200 flex-col border-r bg-white dark:bg-gray-900 transition-all duration-300"
+  [ngClass]="isExpanded ? 'w-64' : 'w-16'"
+>
+  <!-- Logo Section -->
+  <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+    <button (click)="toggleExpand()" class="flex items-center space-x-2">
+      <div
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-primary"
+      >
+        <span class="text-sm font-bold text-white">MG</span>
+      </div>
+      <span
+        *ngIf="isExpanded"
+        class="text-gray-800 dark:text-white text-lg font-semibold"
+        >MonGarage</span
+      >
+    </button>
+  </div>
+
+  <!-- Navigation Items -->
+  <nav class="flex-1 py-4">
+    <ul class="space-y-2">
+      <li *ngFor="let item of navItems">
+        <a
+          [routerLink]="item.route"
+          class="flex items-center text-gray-600 dark:text-gray-300 transition-colors duration-200"
+        >
+          <i [class]="item.icon"></i>
+          <span *ngIf="isExpanded" class="ml-3 text-xs">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- User Profile Section -->
+  <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+    <div class="relative">
+      <button
+        class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-primary transition-colors duration-200"
+      >
+        <i (click)="toggleExpand()" class="fas fa-user w-5 h-5"></i>
+        <span *ngIf="isExpanded" class="ml-3 text-xs">Profile</span>
+        <i
+          *ngIf="isExpanded"
+          class="fas fa-chevron-down text-xs ml-1"
+          (click)="toggleUserMenu()"
+        ></i>
+      </button>
+
+      <!-- User Dropdown Menu -->
+      <div
+        *ngIf="isUserMenuOpen"
+        class="absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
+      >
+        <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <p class="text-sm font-medium text-gray-800 dark:text-white">
+            {{ (currentUser$ | async)?.prenom }}
+            {{ (currentUser$ | async)?.nom }}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ (currentUser$ | async)?.email }}
+          </p>
+        </div>
+        <button
+          (click)="onLogout()"
+          class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center"
+        >
+          <i class="fas fa-sign-out-alt w-4 h-4 mr-2"></i>
+          Se déconnecter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,161 @@
+<form [formGroup]="servicesForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <div *ngIf="isLoading" class="flex justify-center">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-primary"
+    ></div>
+  </div>
+
+  <div *ngIf="error" class="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!isLoading" class="mb-8">
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold text-gray-900">Services souhaités</h3>
+
+      <!-- Tags sélectionnés -->
+      <div class="flex flex-wrap gap-2 min-h-[2.5rem]">
+        <div
+          *ngFor="let service of selectedServices"
+          class="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full"
+        >
+          <i [class]="service.icone"></i>
+          <span>{{ service.titre }}</span>
+          <button
+            type="button"
+            (click)="removeService(service)"
+            class="text-blue-600 hover:text-blue-800"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      <!-- Input de recherche -->
+      <div class="relative">
+        <input
+          type="text"
+          style="outline: none"
+          formControlName="searchService"
+          placeholder="Rechercher un service..."
+          class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+
+        <!-- Liste des suggestions -->
+        <div
+          *ngIf="
+            filteredServices.length > 0 &&
+            servicesForm.get('searchService')?.value
+          "
+          class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg"
+        >
+          <div
+            *ngFor="let service of filteredServices"
+            (click)="addService(service)"
+            class="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+          >
+            <i [class]="service.icone"></i>
+            <div>
+              <div class="font-medium">{{ service.titre }}</div>
+              <div class="text-sm text-gray-600">{{ service.description }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estimation -->
+      <div *ngIf="selectedServices.length > 0" class="mt-6 space-y-4">
+        <h4 class="text-lg font-semibold text-gray-900">Estimation</h4>
+
+        <div *ngIf="isLoadingEstimation" class="flex justify-center">
+          <div
+            class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-primary"
+          ></div>
+        </div>
+
+        <div
+          *ngIf="estimation && !isLoadingEstimation"
+          class="bg-white rounded-lg border border-gray-200 p-4"
+        >
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-600">Coût estimé</p>
+              <p class="text-lg font-semibold text-blue-primary">
+                {{ estimation.cout_estime | numberFormat }} Ar
+              </p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Temps estimé</p>
+              <p class="text-lg font-semibold text-blue-primary">
+                {{ estimation.temps_estime | numberFormat }}h
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <p class="text-sm text-gray-600">Détails</p>
+            <div class="mt-2 space-y-2">
+              <div class="flex justify-between text-sm">
+                <span
+                  >Type de véhicule ({{
+                    estimation.details.type_vehicule.libelle
+                  }})</span
+                >
+                <span
+                  >×{{
+                    estimation.details.type_vehicule.coefficient_estimation
+                      | numberFormat
+                  }}</span
+                >
+              </div>
+              <div class="flex justify-between text-sm">
+                <span
+                  >État du véhicule ({{
+                    estimation.details.etat_vehicule.etat
+                  }})
+                </span>
+                <span
+                  >×{{
+                    estimation.details.etat_vehicule.facteur_etat | numberFormat
+                  }}</span
+                >
+              </div>
+              <div class="border-t border-gray-200 pt-2 mt-2">
+                <p class="text-sm font-medium mb-2">
+                  Services inclus (coût de base) :
+                </p>
+                <div class="space-y-1">
+                  <div
+                    *ngFor="let item of estimation.details.services"
+                    class="flex justify-between text-sm"
+                  >
+                    <span>{{ item.service.titre }}</span>
+                    <span>{{ item.service.cout_base | numberFormat }} Ar</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between pt-4">
+      <button
+        *ngIf="currentStep > 1"
+        (click)="onPreviousStep()"
+        class="cursor-pointer px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+      >
+        Précédent
+      </button>
+      <button
+        type="submit"
+        [disabled]="selectedServices.length === 0"
+        class="cursor-pointer px-4 py-2 bg-blue-primary text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Suivant
+      </button>
+    </div>
+  </div>
+</form>
