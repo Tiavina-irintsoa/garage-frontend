@@ -9,7 +9,6 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './mes-demandes.component.html',
-  styleUrls: ['./mes-demandes.component.css'],
 })
 export class MesDemandesComponent implements OnInit {
   demandes: Demande[] = [];
