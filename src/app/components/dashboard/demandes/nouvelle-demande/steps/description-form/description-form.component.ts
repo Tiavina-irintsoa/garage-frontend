@@ -35,7 +35,7 @@ export class DescriptionFormComponent implements OnInit {
   description: string = '';
   error: string | null = null;
   isValid: boolean = false;
-  selectedVideos: File[] = [];
+  selectedImages: File[] = [];
   pondFiles: any[] = [];
 
   pondOptions = {
@@ -44,9 +44,9 @@ export class DescriptionFormComponent implements OnInit {
     instantUpload: false,
     allowReorder: true,
     labelIdle:
-      'Glissez et déposez vos vidéos ici ou <span class="filepond--label-action">Parcourir</span>',
-    acceptedFileTypes: ['video/*'],
-    fileValidateTypeLabelExpectedTypes: 'Fichiers vidéo uniquement',
+      'Glissez et déposez vos images ici ou <span class="filepond--label-action">Parcourir</span>',
+    acceptedFileTypes: ['image/jpeg', 'image/jpg', 'image/png'],
+    fileValidateTypeLabelExpectedTypes: 'Formats acceptés : JPG, PNG',
     labelFileTypeNotAllowed: 'Type de fichier non autorisé',
     labelTapToCancel: 'Cliquer pour annuler',
     labelTapToRetry: 'Cliquer pour réessayer',
@@ -59,7 +59,7 @@ export class DescriptionFormComponent implements OnInit {
     styleProgressIndicatorPosition: 'right bottom',
     styleButtonRemoveItemPosition: 'left bottom',
     styleButtonProcessItemPosition: 'right bottom',
-    name: 'videos',
+    name: 'images',
   };
 
   constructor(private nouvelleDemandService: NouvelleDemandService) {}
@@ -88,34 +88,34 @@ export class DescriptionFormComponent implements OnInit {
   }
 
   pondHandleAddFile(event: any): void {
-    console.log('Vidéo ajoutée', event.file);
+    console.log('Image ajoutée', event.file);
     if (event.file && event.file.file) {
-      this.selectedVideos.push(event.file.file);
-      this.pondFiles = [...this.selectedVideos];
+      this.selectedImages.push(event.file.file);
+      this.pondFiles = [...this.selectedImages];
     }
   }
 
   pondHandleRemoveFile(event: any): void {
-    console.log('Vidéo supprimée', event.file);
-    const index = this.selectedVideos.findIndex(
+    console.log('Image supprimée', event.file);
+    const index = this.selectedImages.findIndex(
       (file) => file === event.file.file
     );
     if (index > -1) {
-      this.selectedVideos.splice(index, 1);
-      this.pondFiles = [...this.selectedVideos];
+      this.selectedImages.splice(index, 1);
+      this.pondFiles = [...this.selectedImages];
     }
   }
 
   pondHandleError(error: any): void {
     console.error('Erreur FilePond:', error);
-    this.error = 'Une erreur est survenue lors du chargement de la vidéo';
+    this.error = "Une erreur est survenue lors du chargement de l'image";
   }
 
   onSubmit(): void {
     this.validateContent();
     if (this.isValid) {
       this.nouvelleDemandService.updateDescriptionData(this.description);
-      // Ici vous pouvez stocker les vidéos sélectionnées dans le service
+      // Ici vous pouvez stocker les images sélectionnées dans le service
       this.stepComplete.emit();
     }
   }

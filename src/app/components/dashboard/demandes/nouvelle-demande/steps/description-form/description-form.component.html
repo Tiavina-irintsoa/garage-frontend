@@ -25,20 +25,21 @@
       </div>
     </div>
 
-    <!-- Upload de vidéos -->
-    <div class="video-upload-container mt-8">
+    <!-- Upload d'images -->
+    <div class="image-upload-container mt-8">
       <h4 class="text-lg font-medium text-gray-900 mb-2">
-        Vidéos illustratives
+        Images illustratives
       </h4>
       <p class="text-sm text-gray-600 mb-4">
-        Ajoutez jusqu'à 5 vidéos pour illustrer votre demande. Les vidéos ne
-        seront pas uploadées immédiatement.
+        Ajoutez jusqu'à 5 images pour illustrer votre demande (formats acceptés
+        : JPG, PNG).
       </p>
 
       <file-pond
         #myPond
-        name="videos"
+        name="images"
         [options]="pondOptions"
+        [files]="pondFiles"
         (oninit)="pondHandleInit()"
         (onaddfile)="pondHandleAddFile($event)"
         (onremovefile)="pondHandleRemoveFile($event)"
@@ -46,8 +47,8 @@
         class="w-full"
       ></file-pond>
 
-      <div *ngIf="selectedVideos.length > 0" class="mt-4 text-sm text-gray-600">
-        {{ selectedVideos.length }} vidéo(s) sélectionnée(s)
+      <div *ngIf="selectedImages.length > 0" class="mt-4 text-sm text-gray-600">
+        {{ selectedImages.length }} image(s) sélectionnée(s)
       </div>
     </div>
   </div>
