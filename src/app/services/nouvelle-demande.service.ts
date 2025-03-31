@@ -36,8 +36,10 @@ export class NouvelleDemandService {
   }
 
   updateDescriptionData(description: string) {
+    console.log('description :', description);
     const currentData = this.formData.value;
     this.formData.next({ ...currentData, description });
+    console.log('description mise à jour:', this.formData.value);
   }
 
   updateImagesData(files: File[], pondFiles: any[]) {

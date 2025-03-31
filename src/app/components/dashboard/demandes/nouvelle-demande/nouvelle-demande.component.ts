@@ -74,7 +74,7 @@ export class NouvelleDemandComponent implements OnInit {
         this.nouvelleDemandService.updateServicesData(stepData);
         break;
       case 3:
-        this.nouvelleDemandService.updateDescriptionData(stepData);
+        // this.nouvelleDemandService.updateDescriptionData(stepData);
         break;
       case 4:
         this.nouvelleDemandService.updateRendezVousData(

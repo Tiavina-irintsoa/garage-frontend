@@ -134,6 +134,19 @@ export class DescriptionFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  private saveCurrentState(): void {
+    if (this.description?.trim()) {
+      console.log('description  :', this.description);
+      this.nouvelleDemandService.updateDescriptionData(this.description);
+    }
+    if (this.selectedFiles.length > 0) {
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
+    }
+  }
+
   pondHandleError(error: any): void {
     console.error('Erreur FilePond:', error);
     this.error = "Une erreur est survenue lors du chargement de l'image";
@@ -142,23 +155,13 @@ export class DescriptionFormComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     this.validateContent();
     if (this.isValid) {
-      this.nouvelleDemandService.updateDescriptionData(this.description);
-      this.nouvelleDemandService.updateImagesData(
-        this.selectedFiles,
-        this.pondFiles
-      );
+      this.saveCurrentState();
       this.stepComplete.emit();
     }
   }
 
   onPreviousStep(): void {
-    if (this.description) {
-      this.nouvelleDemandService.updateDescriptionData(this.description);
-    }
-    this.nouvelleDemandService.updateImagesData(
-      this.selectedFiles,
-      this.pondFiles
-    );
+    this.saveCurrentState();
     this.previousStep.emit();
   }
 }
