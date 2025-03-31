@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Vehicule, DemandeService as Service } from '../models/demande.interface';
+import {
+  Vehicule,
+  DemandeService as Service,
+  ImageDemande,
+  DemandeFormData as BaseDemandeFormData,
+} from '../models/demande.interface';
 
-export interface DemandeFormData {
-  vehicule?: Vehicule;
-  services?: Service[];
-  description?: string;
-  date_rdv?: string;
-  heure_rdv?: string;
+interface DemandeFormData extends BaseDemandeFormData {
+  _tempFiles?: {
+    files: File[];
+    pondFiles: any[];
+  };
 }
 
 @Injectable({
@@ -16,6 +20,10 @@ export interface DemandeFormData {
 export class NouvelleDemandService {
   private formData = new BehaviorSubject<DemandeFormData>({});
   formData$ = this.formData.asObservable();
+
+  getFormData() {
+    return this.formData.value;
+  }
 
   updateVehiculeData(vehicule: Vehicule) {
     const currentData = this.formData.value;
@@ -32,6 +40,23 @@ export class NouvelleDemandService {
     this.formData.next({ ...currentData, description });
   }
 
+  updateImagesData(files: File[], pondFiles: any[]) {
+    const currentData = this.formData.value;
+    const images: ImageDemande[] = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      nom: file.name,
+      type: file.type,
+      taille: file.size,
+      dateUpload: new Date().toISOString(),
+    }));
+
+    this.formData.next({
+      ...currentData,
+      images,
+      _tempFiles: { files, pondFiles }, // Stockage temporaire des fichiers originaux
+    });
+  }
+
   updateRendezVousData(date: string, heure: string) {
     const currentData = this.formData.value;
     this.formData.next({
@@ -42,6 +67,15 @@ export class NouvelleDemandService {
   }
 
   resetForm() {
+    // Nettoyer les URLs des objets avant de réinitialiser
+    const currentData = this.formData.value;
+    if (currentData.images) {
+      currentData.images.forEach((image) => {
+        if (image.url.startsWith('blob:')) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+    }
     this.formData.next({});
   }
 }

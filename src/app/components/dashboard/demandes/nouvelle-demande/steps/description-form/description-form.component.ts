@@ -5,6 +5,7 @@ import {
   Output,
   Input,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,7 @@ import {
   registerPlugin,
 } from 'ngx-filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import { ImageDemande } from '../../../../../../models/demande.interface';
 
 // Enregistrer les plugins FilePond
 registerPlugin(FilePondPluginFileValidateType);
@@ -26,7 +28,7 @@ registerPlugin(FilePondPluginFileValidateType);
   templateUrl: './description-form.component.html',
   styleUrls: ['./description-form.component.scss'],
 })
-export class DescriptionFormComponent implements OnInit {
+export class DescriptionFormComponent implements OnInit, OnDestroy {
   @ViewChild('myPond') myPond!: FilePondComponent;
   @Output() stepComplete = new EventEmitter<void>();
   @Input() currentStep: number = 3;
@@ -35,8 +37,9 @@ export class DescriptionFormComponent implements OnInit {
   description: string = '';
   error: string | null = null;
   isValid: boolean = false;
-  selectedImages: File[] = [];
+  selectedFiles: File[] = [];
   pondFiles: any[] = [];
+  images: ImageDemande[] = [];
 
   pondOptions = {
     allowMultiple: true,
@@ -70,6 +73,23 @@ export class DescriptionFormComponent implements OnInit {
         this.description = data.description;
         this.validateContent();
       }
+      if (data.images) {
+        this.images = data.images;
+        // Restaurer les fichiers temporaires si disponibles
+        if ((data as any)._tempFiles) {
+          this.selectedFiles = (data as any)._tempFiles.files;
+          this.pondFiles = (data as any)._tempFiles.pondFiles;
+        }
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Nettoyer les URLs des objets si nécessaire
+    this.images.forEach((image) => {
+      if (image.url.startsWith('blob:')) {
+        URL.revokeObjectURL(image.url);
+      }
     });
   }
 
@@ -90,19 +110,27 @@ export class DescriptionFormComponent implements OnInit {
   pondHandleAddFile(event: any): void {
     console.log('Image ajoutée', event.file);
     if (event.file && event.file.file) {
-      this.selectedImages.push(event.file.file);
-      this.pondFiles = [...this.selectedImages];
+      this.selectedFiles.push(event.file.file);
+      this.pondFiles = [...this.pondFiles, event.file];
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
     }
   }
 
   pondHandleRemoveFile(event: any): void {
     console.log('Image supprimée', event.file);
-    const index = this.selectedImages.findIndex(
+    const index = this.selectedFiles.findIndex(
       (file) => file === event.file.file
     );
     if (index > -1) {
-      this.selectedImages.splice(index, 1);
-      this.pondFiles = [...this.selectedImages];
+      this.selectedFiles.splice(index, 1);
+      this.pondFiles = this.pondFiles.filter((f) => f !== event.file);
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
     }
   }
 
@@ -115,7 +143,10 @@ export class DescriptionFormComponent implements OnInit {
     this.validateContent();
     if (this.isValid) {
       this.nouvelleDemandService.updateDescriptionData(this.description);
-      // Ici vous pouvez stocker les images sélectionnées dans le service
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
       this.stepComplete.emit();
     }
   }
@@ -124,6 +155,10 @@ export class DescriptionFormComponent implements OnInit {
     if (this.description) {
       this.nouvelleDemandService.updateDescriptionData(this.description);
     }
+    this.nouvelleDemandService.updateImagesData(
+      this.selectedFiles,
+      this.pondFiles
+    );
     this.previousStep.emit();
   }
 }
