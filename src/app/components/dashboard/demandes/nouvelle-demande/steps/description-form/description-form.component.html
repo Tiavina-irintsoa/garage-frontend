@@ -12,7 +12,8 @@
 
     <div class="description-container">
       <textarea
-        [(ngModel)]="description"
+        [ngModel]="description"
+        name="description"
         (ngModelChange)="onDescriptionChange($event)"
         placeholder="Décrivez votre demande ici..."
         class="w-full min-h-[200px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
@@ -21,6 +22,32 @@
 
       <div *ngIf="error" class="mt-2 text-sm text-red-600">
         {{ error }}
+      </div>
+    </div>
+
+    <!-- Upload de vidéos -->
+    <div class="video-upload-container mt-8">
+      <h4 class="text-lg font-medium text-gray-900 mb-2">
+        Vidéos illustratives
+      </h4>
+      <p class="text-sm text-gray-600 mb-4">
+        Ajoutez jusqu'à 5 vidéos pour illustrer votre demande. Les vidéos ne
+        seront pas uploadées immédiatement.
+      </p>
+
+      <file-pond
+        #myPond
+        name="videos"
+        [options]="pondOptions"
+        (oninit)="pondHandleInit()"
+        (onaddfile)="pondHandleAddFile($event)"
+        (onremovefile)="pondHandleRemoveFile($event)"
+        (onerror)="pondHandleError($event)"
+        class="w-full"
+      ></file-pond>
+
+      <div *ngIf="selectedVideos.length > 0" class="mt-4 text-sm text-gray-600">
+        {{ selectedVideos.length }} vidéo(s) sélectionnée(s)
       </div>
     </div>
   </div>
