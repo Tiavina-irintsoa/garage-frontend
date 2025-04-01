@@ -1,25 +1,73 @@
-<form [formGroup]="descriptionForm" (ngSubmit)="onSubmit()">
-  <div class="space-y-6">
-    <h3 class="text-xl font-semibold text-gray-900">Description du problème</h3>
+<div class="space-y-6">
+  <div *ngIf="error" class="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
+    {{ error }}
+  </div>
 
-    <!-- Les champs seront ajoutés plus tard -->
+  <div class="space-y-4">
+    <h3 class="text-xl font-semibold text-gray-900">Description détaillée</h3>
+    <p class="text-sm text-gray-600">
+      Décrivez en détail votre demande de service. Soyez aussi précis que
+      possible pour nous aider à mieux comprendre vos besoins.
+    </p>
 
-    <!-- Navigation -->
-    <div class="flex justify-between pt-4">
-      <button
-        *ngIf="currentStep > 1"
-        (click)="onPreviousStep()"
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-      >
-        Précédent
-      </button>
-      <button
-        type="submit"
-        [disabled]="!descriptionForm.valid"
-        class="px-4 py-2 bg-blue-primary text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Suivant
-      </button>
+    <div class="description-container">
+      <textarea
+        [ngModel]="description"
+        name="description"
+        (ngModelChange)="onDescriptionChange($event)"
+        placeholder="Décrivez votre demande ici..."
+        class="w-full min-h-[200px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+        [class.border-red-300]="error"
+      ></textarea>
+
+      <div *ngIf="error" class="mt-2 text-sm text-red-600">
+        {{ error }}
+      </div>
+    </div>
+
+    <!-- Upload d'images -->
+    <div class="image-upload-container mt-8">
+      <h4 class="text-lg font-medium text-gray-900 mb-2">
+        Images illustratives
+      </h4>
+      <p class="text-sm text-gray-600 mb-4">
+        Ajoutez jusqu'à 5 images pour illustrer votre demande (formats acceptés
+        : JPG, PNG).
+      </p>
+
+      <file-pond
+        #myPond
+        name="images"
+        [options]="pondOptions"
+        [files]="pondFiles"
+        (oninit)="pondHandleInit()"
+        (onaddfile)="pondHandleAddFile($event)"
+        (onremovefile)="pondHandleRemoveFile($event)"
+        (onerror)="pondHandleError($event)"
+        class="w-full"
+      ></file-pond>
+
+      <div *ngIf="selectedFiles.length > 0" class="mt-4 text-sm text-gray-600">
+        {{ selectedFiles.length }} image(s) sélectionnée(s)
+      </div>
     </div>
   </div>
-</form>
+
+  <!-- Navigation -->
+  <div class="flex justify-between pt-4">
+    <button
+      *ngIf="currentStep > 1"
+      (click)="onPreviousStep()"
+      class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+    >
+      Précédent
+    </button>
+    <button
+      (click)="onSubmit()"
+      [disabled]="!isValid"
+      class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      Suivant
+    </button>
+  </div>
+</div>

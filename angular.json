@@ -31,7 +31,8 @@
             ],
             "styles": [
               "src/styles.css",
-              "./node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+              "./node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "./node_modules/filepond/dist/filepond.min.css"
             ],
             "scripts": [],
             "server": "src/main.server.ts",

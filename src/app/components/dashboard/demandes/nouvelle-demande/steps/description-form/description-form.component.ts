@@ -1,266 +1,167 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  Input,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  AngularEditorModule,
-  AngularEditorConfig,
-} from '@kolkov/angular-editor';
 import { NouvelleDemandService } from '../../../../../../services/nouvelle-demande.service';
-import { UploadService } from '../../../../../../services/upload.service';
+import {
+  FilePondModule,
+  FilePondComponent,
+  registerPlugin,
+} from 'ngx-filepond';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import { ImageDemande } from '../../../../../../models/demande.interface';
-import { firstValueFrom } from 'rxjs';
-import { HttpEvent } from '@angular/common/http';
 
-interface UploadResponse {
-  url: string;
-}
+// Enregistrer les plugins FilePond
+registerPlugin(FilePondPluginFileValidateType);
 
 @Component({
   selector: 'app-description-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, AngularEditorModule],
-  template: `
-    <div class="space-y-6">
-      <div *ngIf="error" class="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
-        {{ error }}
-      </div>
-
-      <div class="space-y-4">
-        <h3 class="text-xl font-semibold text-gray-900">
-          Description détaillée
-        </h3>
-        <p class="text-sm text-gray-600">
-          Décrivez en détail votre demande. Vous pouvez ajouter des images pour
-          illustrer votre description.
-        </p>
-
-        <div class="editor-container">
-          <div
-            class="border border-gray-300 rounded-t-lg"
-            [ngClass]="{ 'border-red-300': error }"
-          >
-            <angular-editor
-              [(ngModel)]="description"
-              [config]="editorConfig"
-              (ngModelChange)="onDescriptionChange($event)"
-            ></angular-editor>
-          </div>
-        </div>
-
-        <div
-          *ngIf="isUploading"
-          class="flex items-center justify-center space-x-2 text-blue-600"
-        >
-          <div
-            class="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-blue-600"
-          ></div>
-          <span>Upload en cours...</span>
-        </div>
-      </div>
-
-      <!-- Navigation -->
-      <div class="flex justify-between pt-4">
-        <button
-          *ngIf="currentStep > 1"
-          (click)="onPreviousStep()"
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-        >
-          Précédent
-        </button>
-        <button
-          (click)="onSubmit()"
-          [disabled]="!isValid || isUploading"
-          class="px-4 py-2 bg-blue-primary text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Suivant
-        </button>
-      </div>
-    </div>
-  `,
-  styles: [
-    `
-      :host ::ng-deep .angular-editor-textarea {
-        min-height: 300px !important;
-        border: none !important;
-        padding: 1rem !important;
-        font-family: Arial, Helvetica, sans-serif !important;
-      }
-      :host ::ng-deep .angular-editor-toolbar {
-        border: none !important;
-        background-color: white !important;
-      }
-      :host ::ng-deep .angular-editor-button {
-        background-color: white !important;
-        padding: 0.5rem !important;
-        margin: 0 0.25rem !important;
-        border-radius: 0.375rem !important;
-      }
-      :host ::ng-deep .angular-editor-button i {
-        font-style: normal !important;
-        display: inline-block !important;
-        font-family: 'Font Awesome 6 Free' !important;
-        font-weight: 900 !important;
-      }
-      :host ::ng-deep .angular-editor-button:hover {
-        background-color: #f3f4f6 !important;
-        transition: all 0.2s ease-in-out;
-      }
-      :host ::ng-deep .angular-editor-toolbar-set {
-        border-radius: 0.375rem;
-        padding: 0.25rem;
-        margin: 0 !important;
-        background-color: white !important;
-        border: none !important;
-      }
-      :host ::ng-deep .angular-editor-button.active {
-        background-color: #e5e7eb !important;
-      }
-      :host ::ng-deep select {
-        height: 2rem !important;
-        padding: 0 0.5rem !important;
-        font-size: 0.875rem !important;
-        border-radius: 0.375rem !important;
-        border-color: #e5e7eb !important;
-      }
-      :host ::ng-deep .fa-bold::before {
-        content: '\\f032' !important;
-      }
-      :host ::ng-deep .fa-italic::before {
-        content: '\\f033' !important;
-      }
-      :host ::ng-deep .fa-underline::before {
-        content: '\\f0cd' !important;
-      }
-      :host ::ng-deep .fa-strikethrough::before {
-        content: '\\f0cc' !important;
-      }
-      :host ::ng-deep .fa-list-ul::before {
-        content: '\\f0ca' !important;
-      }
-      :host ::ng-deep .fa-list-ol::before {
-        content: '\\f0cb' !important;
-      }
-      :host ::ng-deep .fa-link::before {
-        content: '\\f0c1' !important;
-      }
-      :host ::ng-deep .fa-text-height::before {
-        content: '\\f034' !important;
-      }
-      :host ::ng-deep .fa-image::before {
-        content: '\\f03e' !important;
-      }
-    `,
-  ],
+  imports: [CommonModule, FormsModule, FilePondModule],
+  templateUrl: './description-form.component.html',
+  styleUrls: ['./description-form.component.scss'],
 })
-export class DescriptionFormComponent implements OnInit {
+export class DescriptionFormComponent implements OnInit, OnDestroy {
+  @ViewChild('myPond') myPond!: FilePondComponent;
   @Output() stepComplete = new EventEmitter<void>();
   @Input() currentStep: number = 3;
   @Output() previousStep = new EventEmitter<void>();
 
   description: string = '';
   error: string | null = null;
-  uploadedImages: ImageDemande[] = [];
   isValid: boolean = false;
-  isUploading: boolean = false;
+  selectedFiles: File[] = [];
+  pondFiles: any[] = [];
+  images: ImageDemande[] = [];
 
-  editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    height: 'auto',
-    minHeight: '300px',
-    maxHeight: '500px',
-    width: 'auto',
-    minWidth: '0',
-    translate: 'yes',
-    enableToolbar: true,
-    showToolbar: true,
-    placeholder: 'Entrez votre description ici...',
-    defaultParagraphSeparator: 'p',
-    defaultFontName: 'Arial',
-    defaultFontSize: '3',
-    uploadUrl: 'api/upload',
-    uploadWithCredentials: false,
-    toolbarPosition: 'top',
-    toolbarHiddenButtons: [
-      [
-        'subscript',
-        'superscript',
-        'justifyFull',
-        'indent',
-        'outdent',
-        'heading',
-        'fontName',
-      ],
-      [
-        'fontSize',
-        'textColor',
-        'backgroundColor',
-        'customClasses',
-        'insertVideo',
-        'insertHorizontalRule',
-        'removeFormat',
-      ],
-    ],
+  pondOptions = {
+    allowMultiple: true,
+    maxFiles: 5,
+    instantUpload: false,
+    allowReorder: true,
+    labelIdle:
+      'Glissez et déposez vos images ici ou <span class="filepond--label-action">Parcourir</span>',
+    acceptedFileTypes: ['image/jpeg', 'image/jpg', 'image/png'],
+    fileValidateTypeLabelExpectedTypes: 'Formats acceptés : JPG, PNG',
+    labelFileTypeNotAllowed: 'Type de fichier non autorisé',
+    labelTapToCancel: 'Cliquer pour annuler',
+    labelTapToRetry: 'Cliquer pour réessayer',
+    labelTapToUndo: 'Cliquer pour supprimer',
+    labelFileProcessing: 'Chargement',
+    labelFileProcessingComplete: 'Chargé',
+    labelFileProcessingAborted: 'Annulé',
+    labelFileProcessingError: 'Erreur lors du chargement',
+    styleLoadIndicatorPosition: 'center bottom',
+    styleProgressIndicatorPosition: 'right bottom',
+    styleButtonRemoveItemPosition: 'left bottom',
+    styleButtonProcessItemPosition: 'right bottom',
+    name: 'images',
   };
 
-  constructor(
-    private nouvelleDemandService: NouvelleDemandService,
-    private uploadService: UploadService
-  ) {}
+  constructor(private nouvelleDemandService: NouvelleDemandService) {}
 
   ngOnInit(): void {
-    // Charger les données existantes s'il y en a
     this.nouvelleDemandService.formData$.subscribe((data) => {
       if (data.description) {
         this.description = data.description;
         this.validateContent();
       }
+      if (data.images) {
+        this.images = data.images;
+        // Restaurer les fichiers temporaires si disponibles
+        if ((data as any)._tempFiles) {
+          this.selectedFiles = (data as any)._tempFiles.files;
+          this.pondFiles = (data as any)._tempFiles.pondFiles;
+        }
+      }
     });
   }
 
-  onDescriptionChange(content: string) {
-    this.validateContent();
-
-    // Extraire et sauvegarder les nouvelles images
-    const imageUrls = this.uploadService.extractImagesFromHtml(content);
-    this.uploadedImages = imageUrls
-      .filter((url) => this.uploadService.isCloudinaryUrl(url))
-      .map((url) => ({
-        url,
-        nom: url.split('/').pop() || '',
-        type: 'image/jpeg', // À améliorer pour détecter le vrai type
-        taille: 0, // À améliorer
-        dateUpload: new Date().toISOString(),
-      }));
+  ngOnDestroy(): void {
+    // Nettoyer les URLs des objets si nécessaire
+    this.images.forEach((image) => {
+      if (image.url.startsWith('blob:')) {
+        URL.revokeObjectURL(image.url);
+      }
+    });
   }
 
-  validateContent() {
-    // Vérifier que la description n'est pas vide et contient du contenu réel
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = this.description;
-    const textContent = tempDiv.textContent || tempDiv.innerText;
-    this.isValid = textContent.trim().length > 0;
+  onDescriptionChange(value: string): void {
+    this.description = value;
+    this.validateContent();
+  }
+
+  validateContent(): void {
+    this.isValid = this.description.trim().length > 0;
+    this.error = this.isValid ? null : 'La description est requise';
+  }
+
+  pondHandleInit(): void {
+    console.log('FilePond initialisé', this.myPond);
+  }
+
+  pondHandleAddFile(event: any): void {
+    console.log('Image ajoutée', event.file);
+    if (event.file && event.file.file) {
+      this.selectedFiles.push(event.file.file);
+      this.pondFiles = [...this.pondFiles, event.file];
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
+    }
+  }
+
+  pondHandleRemoveFile(event: any): void {
+    console.log('Image supprimée', event.file);
+    const index = this.selectedFiles.findIndex(
+      (file) => file === event.file.file
+    );
+    if (index > -1) {
+      this.selectedFiles.splice(index, 1);
+      this.pondFiles = this.pondFiles.filter((f) => f !== event.file);
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
+    }
+  }
+
+  private saveCurrentState(): void {
+    if (this.description?.trim()) {
+      console.log('description  :', this.description);
+      this.nouvelleDemandService.updateDescriptionData(this.description);
+    }
+    if (this.selectedFiles.length > 0) {
+      this.nouvelleDemandService.updateImagesData(
+        this.selectedFiles,
+        this.pondFiles
+      );
+    }
+  }
+
+  pondHandleError(error: any): void {
+    console.error('Erreur FilePond:', error);
+    this.error = "Une erreur est survenue lors du chargement de l'image";
   }
 
   onSubmit(): void {
-    if (!this.isValid) {
-      this.error = 'Veuillez entrer une description';
-      return;
+    this.validateContent();
+    if (this.isValid) {
+      this.saveCurrentState();
+      this.stepComplete.emit();
     }
-
-    if (this.isUploading) {
-      this.error = "Veuillez attendre la fin de l'upload des images";
-      return;
-    }
-
-    this.nouvelleDemandService.updateDescriptionData(this.description);
-    this.stepComplete.emit();
   }
 
   onPreviousStep(): void {
-    if (this.description) {
-      this.nouvelleDemandService.updateDescriptionData(this.description);
-    }
+    this.saveCurrentState();
     this.previousStep.emit();
   }
 }
