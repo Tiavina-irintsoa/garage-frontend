@@ -46,6 +46,7 @@ export class DescriptionFormComponent implements OnInit, OnDestroy {
     maxFiles: 5,
     instantUpload: false,
     allowReorder: true,
+    allowRevert: false,
     labelIdle:
       'Glissez et déposez vos images ici ou <span class="filepond--label-action">Parcourir</span>',
     acceptedFileTypes: ['image/jpeg', 'image/jpg', 'image/png'],
@@ -68,6 +69,8 @@ export class DescriptionFormComponent implements OnInit, OnDestroy {
   constructor(private nouvelleDemandService: NouvelleDemandService) {}
 
   ngOnInit(): void {
+    console.log('ngOnInit');
+    console.log('images ', this.images);
     this.nouvelleDemandService.formData$.subscribe((data) => {
       if (data.description) {
         this.description = data.description;
@@ -107,30 +110,87 @@ export class DescriptionFormComponent implements OnInit, OnDestroy {
     console.log('FilePond initialisé', this.myPond);
   }
 
+  // pondHandleAddFile(event: any): void {
+  //   console.log('Image ajoutée', event.file);
+  //   if (event.file && event.file.file) {
+  //     this.selectedFiles.push(event.file.file);
+  //     this.pondFiles = [...this.pondFiles, event.file];
+  //     this.nouvelleDemandService.updateImagesData(
+  //       this.selectedFiles,
+  //       this.pondFiles
+  //     );
+  //   }
+  // }
+
   pondHandleAddFile(event: any): void {
-    console.log('Image ajoutée', event.file);
+    console.log('Image ajoutée file ', event.file.file.name);
     if (event.file && event.file.file) {
-      this.selectedFiles.push(event.file.file);
-      this.pondFiles = [...this.pondFiles, event.file];
-      this.nouvelleDemandService.updateImagesData(
-        this.selectedFiles,
-        this.pondFiles
+      const fileExists = this.selectedFiles.some(
+        (file) => file.name === event.file.file.name
       );
+      console.log('fileExists ', fileExists);
+
+      if (!fileExists) {
+        this.selectedFiles.push(event.file.file);
+        this.pondFiles = [...this.pondFiles, event.file];
+
+        // Mise à jour du service après vérification
+        this.nouvelleDemandService.updateImagesData(
+          this.selectedFiles,
+          this.pondFiles
+        );
+      }
     }
   }
 
+  // pondHandleRemoveFile(event: any): void {
+  //   if (event.file && event.file.file) {
+  //     const index = this.selectedFiles.findIndex(
+  //       (file) =>
+  //         file.name === event.file.file.name &&
+  //         file.size === event.file.file.size
+  //     );
+  //     console.log('index ', index);
+  //     if (index > -1) {
+  //       console.log('index > -1');
+  //       console.log('selectedFiles', this.selectedFiles);
+  //       console.log('pondFiles', this.pondFiles);
+  //       this.selectedFiles.splice(index, 1);
+  //       this.pondFiles = this.pondFiles.filter((f) => f !== event.file);
+  //       this.nouvelleDemandService.updateImagesData(
+  //         this.selectedFiles,
+  //         this.pondFiles
+  //       );
+  //     }
+  //   }
+  // }
+
   pondHandleRemoveFile(event: any): void {
-    console.log('Image supprimée', event.file);
-    const index = this.selectedFiles.findIndex(
-      (file) => file === event.file.file
-    );
-    if (index > -1) {
-      this.selectedFiles.splice(index, 1);
-      this.pondFiles = this.pondFiles.filter((f) => f !== event.file);
-      this.nouvelleDemandService.updateImagesData(
-        this.selectedFiles,
-        this.pondFiles
+    if (event.file && event.file.file) {
+      const index = this.selectedFiles.findIndex(
+        (file) =>
+          file.name === event.file.file.name &&
+          file.size === event.file.file.size
       );
+
+      if (index > -1) {
+        // 1. D'abord vider complètement _tempFiles
+        this.nouvelleDemandService.clearTempFiles();
+
+        // 2. Mettre à jour nos tableaux locaux
+        this.selectedFiles.splice(index, 1);
+
+        console.log('selectedFiles', this.selectedFiles);
+        this.pondFiles = this.pondFiles.filter((f) => f !== event.file);
+
+        // 3. Recréer _tempFiles avec les fichiers restants
+        if (this.selectedFiles.length > 0) {
+          this.nouvelleDemandService.updateImagesData(
+            this.selectedFiles,
+            this.pondFiles
+          );
+        }
+      }
     }
   }
 

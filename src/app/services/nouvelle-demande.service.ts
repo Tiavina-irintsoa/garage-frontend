@@ -30,6 +30,12 @@ export class NouvelleDemandService {
     this.formData.next({ ...currentData, vehicule });
   }
 
+  clearTempFiles() {
+    const currentData = this.formData.value;
+    const { _tempFiles, ...restData } = currentData;
+    this.formData.next(restData);
+  }
+
   updateServicesData(services: Service[]) {
     const currentData = this.formData.value;
     this.formData.next({ ...currentData, services });

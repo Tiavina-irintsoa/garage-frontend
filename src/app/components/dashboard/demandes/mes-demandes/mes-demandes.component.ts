@@ -9,11 +9,13 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './mes-demandes.component.html',
+  styleUrls: ['./mes-demandes.css'],
 })
 export class MesDemandesComponent implements OnInit {
   demandes: Demande[] = [];
   isLoading: boolean = true;
   error: string | null = null;
+  currentPhoto: string | null = null;
 
   constructor(private demandeService: DemandeService) {}
 
@@ -45,5 +47,13 @@ export class MesDemandesComponent implements OnInit {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  }
+
+  openPhotoViewer(photoUrl: string): void {
+    this.currentPhoto = photoUrl;
+  }
+
+  closePhotoViewer(): void {
+    this.currentPhoto = null;
   }
 }
