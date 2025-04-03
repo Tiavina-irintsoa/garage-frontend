@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { animate, style, transition, trigger } from '@angular/animations';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -12,30 +12,20 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
     <div
       *ngIf="show"
       [@fadeInOut]
-      [class]="getToastClass()"
-      role="alert"
-      (click)="close()"
+      class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg"
+      [ngClass]="getToastClasses()"
     >
       <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i [class]="getIconClass()"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium">{{ message }}</p>
-        </div>
+        <span class="mr-2">{{ message }}</span>
+        <button
+          (click)="onClose()"
+          class="ml-auto text-gray-500 hover:text-gray-700"
+        >
+          ×
+        </button>
       </div>
     </div>
   `,
-  styles: [
-    `
-      :host {
-        position: fixed;
-        z-index: 1000;
-        right: 1rem;
-        top: 1rem;
-      }
-    `,
-  ],
   animations: [
     trigger('fadeInOut', [
       transition(':enter', [
@@ -56,38 +46,19 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
 })
 export class ToastComponent {
   @Input() message: string = '';
-  @Input() type: ToastType = 'info';
+  @Input() type: 'success' | 'error' | 'info' = 'info';
   @Input() show: boolean = false;
   @Output() closed = new EventEmitter<void>();
 
-  getToastClass(): string {
-    const baseClasses = 'p-4 rounded-lg shadow-lg cursor-pointer max-w-xs';
-    switch (this.type) {
-      case 'success':
-        return `${baseClasses} bg-green-100 text-green-800`;
-      case 'error':
-        return `${baseClasses} bg-red-100 text-red-800`;
-      case 'warning':
-        return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      default:
-        return `${baseClasses} bg-blue-100 text-blue-800`;
-    }
+  getToastClasses(): { [key: string]: boolean } {
+    return {
+      'bg-green-500 text-white': this.type === 'success',
+      'bg-red-500 text-white': this.type === 'error',
+      'bg-blue-500 text-white': this.type === 'info',
+    };
   }
 
-  getIconClass(): string {
-    switch (this.type) {
-      case 'success':
-        return 'fas fa-check-circle text-green-600';
-      case 'error':
-        return 'fas fa-times-circle text-red-600';
-      case 'warning':
-        return 'fas fa-exclamation-circle text-yellow-600';
-      default:
-        return 'fas fa-info-circle text-blue-600';
-    }
-  }
-
-  close(): void {
+  onClose(): void {
     this.closed.emit();
   }
 }

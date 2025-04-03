@@ -74,7 +74,7 @@ export class UserNavbarComponent implements OnInit {
       roles: ['MANAGER'],
     },
     {
-      icon: 'fas fa-car',
+      icon: 'fas fa-industry',
       label: 'Marques',
       route: '/BO/marques',
       active: false,
@@ -82,6 +82,13 @@ export class UserNavbarComponent implements OnInit {
     },
     {
       icon: 'fas fa-car-side',
+      label: 'Modèles',
+      route: '/BO/modeles',
+      active: false,
+      roles: ['MANAGER'],
+    },
+    {
+      icon: 'fas fa-truck-monster',
       label: 'Types de véhicules',
       route: '/BO/types-vehicules',
       active: false,

@@ -1,0 +1,179 @@
+<div class="container mx-auto px-4 py-8">
+  <app-toast
+    [message]="(toast.toast$ | async)?.message || ''"
+    [type]="(toast.toast$ | async)?.type || 'info'"
+    [show]="(toast.toast$ | async)?.show || false"
+    (closed)="toast.hide()"
+  ></app-toast>
+
+  <h1 class="text-2xl font-bold mb-6">Gestion des Modèles</h1>
+
+  <!-- Formulaire de création -->
+  <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Ajouter un modèle</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="marque">
+          Marque
+        </label>
+        <select
+          id="marque"
+          [(ngModel)]="newModele.marqueId"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          [disabled]="isLoading"
+        >
+          <option value="">Sélectionnez une marque</option>
+          <option *ngFor="let marque of marques" [value]="marque.id">
+            {{ marque.libelle }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="libelle">
+          Libellé
+        </label>
+        <input
+          type="text"
+          id="libelle"
+          [(ngModel)]="newModele.libelle"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          [disabled]="isLoading"
+        />
+      </div>
+    </div>
+    <button
+      (click)="createModele()"
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? "Création en cours..." : "Ajouter" }}
+    </button>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="mb-6">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+      placeholder="Rechercher un modèle..."
+      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    />
+  </div>
+
+  <!-- Liste des modèles -->
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <table class="min-w-full">
+      <thead class="bg-gray-100">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Marque
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Modèle
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let modele of filteredModeles">
+          <td
+            class="px-6 py-4 whitespace-nowrap"
+            *ngIf="editingModele?.id !== modele.id"
+          >
+            {{ getMarqueLibelle(modele.marqueId) }}
+          </td>
+          <td
+            class="px-6 py-4 whitespace-nowrap"
+            *ngIf="editingModele?.id !== modele.id"
+          >
+            {{ modele.libelle }}
+          </td>
+
+          <!-- Mode édition -->
+          <ng-container *ngIf="editingModele?.id === modele.id">
+            <td class="px-6 py-4">
+              <select
+                [ngModel]="editingModele?.marqueId"
+                (ngModelChange)="editingModele!.marqueId = $event"
+                class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              >
+                <option *ngFor="let marque of marques" [value]="marque.id">
+                  {{ marque.libelle }}
+                </option>
+              </select>
+            </td>
+            <td class="px-6 py-4">
+              <input
+                type="text"
+                [ngModel]="editingModele?.libelle"
+                (ngModelChange)="editingModele!.libelle = $event"
+                class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <td
+            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+          >
+            <div class="flex space-x-2">
+              <ng-container *ngIf="editingModele?.id !== modele.id">
+                <button
+                  (click)="startEdit(modele)"
+                  class="text-indigo-600 hover:text-indigo-900"
+                >
+                  Modifier
+                </button>
+                <button
+                  (click)="deleteModele(modele.id!)"
+                  class="text-red-600 hover:text-red-900"
+                >
+                  Supprimer
+                </button>
+              </ng-container>
+              <ng-container *ngIf="editingModele?.id === modele.id">
+                <button
+                  (click)="updateModele()"
+                  class="text-green-600 hover:text-green-900"
+                  [disabled]="isLoading"
+                >
+                  Enregistrer
+                </button>
+                <button
+                  (click)="cancelEdit()"
+                  class="text-gray-600 hover:text-gray-900"
+                >
+                  Annuler
+                </button>
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-4 flex justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+      <button
+        *ngFor="let page of getPages()"
+        (click)="changePage(page)"
+        [class.bg-blue-50]="currentPage === page"
+        [class.text-blue-600]="currentPage === page"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium hover:bg-gray-50"
+      >
+        {{ page }}
+      </button>
+    </nav>
+  </div>
+</div>

@@ -77,6 +77,15 @@ export const routes: Routes = [
         data: { roles: ['MANAGER'] },
       },
       {
+        path: 'modeles',
+        loadComponent: () =>
+          import(
+            './components/dashboard/modeles/gestion-modeles/gestion-modeles.component'
+          ).then((m) => m.GestionModelesComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['MANAGER'] },
+      },
+      {
         path: '',
         loadComponent: () =>
           import('./components/dashboard/overview/overview.component').then(
