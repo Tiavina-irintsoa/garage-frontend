@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { RepairService, Repair, RepairStatus } from '../../services/repair.service';
@@ -15,10 +15,11 @@ interface TeamMember {
 
 interface Task {
   id: string;
-  description: string;
+  title: string;
   completed: boolean;
-  estimatedTime: number;
-  assignedTo: string;
+  assignedTo?: string;
+  assignedMember?: TeamMember;
+  estimatedTime?: number;
 }
 
 interface Part {
@@ -93,6 +94,9 @@ interface TeamMember {
   styleUrls: ['./kanban.component.css']
 })
 export class KanbanComponent implements OnInit {
+  @ViewChild('assigneeSelect') assigneeSelect!: ElementRef<HTMLSelectElement>;
+  @ViewChild('newTaskInput') newTaskInput!: ElementRef<HTMLInputElement>;
+
   columns: KanbanColumn[] = [
     {
       id: 'ATTENTE_ASSIGNATION',
@@ -133,6 +137,8 @@ export class KanbanComponent implements OnInit {
 
   isLoading = true;
   isLoadingDetails = false;
+
+  private assigneeMenuState: { [key: string]: boolean } = {};
 
   constructor(
     private repairService: RepairService,
@@ -340,7 +346,20 @@ export class KanbanComponent implements OnInit {
           createdAt: new Date(repair.dateCreation),
           deadline: new Date(repair.deadline),
           status: repair.statut,
-          assignedTeam: [], // À implémenter quand l'équipe sera disponible
+          assignedTeam: [
+            {
+              id: '1',
+              name: 'Tsiory',
+              role: 'Mécanicien',
+              avatar: 'https://ui-avatars.com/api/?name=Tsiory&background=random'
+            },
+            {
+              id: '2',
+              name: 'Rova',
+              role: 'Mécanicien',
+              avatar: 'https://ui-avatars.com/api/?name=Rova&background=random'
+            }
+          ],
           services: services,
           images: repair.images,
           invoiceUrl: repair.reference_paiement ? `https://example.com/factures/${repair.reference_paiement}.pdf` : undefined
@@ -369,5 +388,115 @@ export class KanbanComponent implements OnInit {
     if (!markdown) return '';
     const html = marked.parse(markdown) as string;
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  toggleAssigneeMenu(taskId: string) {
+    this.assigneeMenuState[taskId] = !this.assigneeMenuState[taskId];
+  }
+
+  isAssigneeMenuOpen(taskId: string): boolean {
+    return this.assigneeMenuState[taskId] || false;
+  }
+
+  assignTaskToMember(service: Service, taskId: string, memberId: string) {
+    const task = service.tasks.find(t => t.id === taskId);
+    if (task) {
+      task.assignedTo = memberId;
+      task.assignedMember = this.selectedProject?.assignedTeam.find(m => m.id === memberId);
+      // Ici, vous pouvez ajouter la logique pour sauvegarder l'assignation
+    }
+    this.toggleAssigneeMenu(taskId);
+  }
+
+  setNewTaskAssignee(memberId: string) {
+    // Stocker l'assignation pour la prochaine tâche créée
+    this.newTaskAssignee = memberId;
+    const member = this.selectedProject?.assignedTeam.find(m => m.id === memberId);
+    this.newTaskAssigneeMember = member || null;
+    this.toggleAssigneeMenu('new');
+  }
+
+  private newTaskAssignee: string | null = null;
+  newTaskAssigneeMember: TeamMember | null = null;
+
+  addTask(service: Service, title: string) {
+    if (!title.trim()) return;
+
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      completed: false,
+      assignedTo: this.newTaskAssignee || undefined,
+      assignedMember: this.newTaskAssigneeMember || undefined
+    };
+
+    service.tasks.push(newTask);
+    this.newTaskAssignee = null;
+    this.newTaskAssigneeMember = null;
+  }
+
+  removeTask(service: Service, taskId: string) {
+    if (service.tasks) {
+      service.tasks = service.tasks.filter(task => task.id !== taskId);
+    }
+  }
+
+  toggleTask(service: Service, taskId: string) {
+    if (service.tasks) {
+      const task = service.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.completed = !task.completed;
+      }
+    }
+  }
+
+  onTaskAssignmentChange(service: Service, taskId: string, event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.assignTask(service, taskId, selectElement.value);
+  }
+
+  // Méthode pour obtenir les tâches par défaut selon le type de service
+  getDefaultTasks(serviceType: string): Task[] {
+    switch (serviceType) {
+      case 'vidange':
+        return [
+          { id: '1', title: 'Vérifier le niveau d\'huile', completed: false },
+          { id: '2', title: 'Changer le filtre à huile', completed: false },
+          { id: '3', title: 'Remplacer l\'huile moteur', completed: false },
+          { id: '4', title: 'Vérifier les fuites', completed: false }
+        ];
+      case 'entretien':
+        return [
+          { id: '1', title: 'Vérifier les niveaux de liquides', completed: false },
+          { id: '2', title: 'Inspecter les freins', completed: false },
+          { id: '3', title: 'Vérifier les pneus', completed: false },
+          { id: '4', title: 'Contrôler les feux', completed: false },
+          { id: '5', title: 'Nettoyer le filtre à air', completed: false }
+        ];
+      case 'réparation':
+        return [
+          { id: '1', title: 'Diagnostic initial', completed: false },
+          { id: '2', title: 'Estimation des coûts', completed: false },
+          { id: '3', title: 'Validation avec le client', completed: false },
+          { id: '4', title: 'Réparation', completed: false },
+          { id: '5', title: 'Test de qualité', completed: false }
+        ];
+      default:
+        return [];
+    }
+  }
+
+  // Méthode pour initialiser les tâches par défaut pour un service
+  initializeDefaultTasks(service: Service) {
+    if (!service.tasks || service.tasks.length === 0) {
+      service.tasks = this.getDefaultTasks(service.type);
+    }
+  }
+
+  assignTask(service: Service, taskId: string, teamMemberId: string) {
+    const task = service.tasks.find(t => t.id === taskId);
+    if (task) {
+      task.assignedTo = teamMemberId;
+    }
   }
 } 
