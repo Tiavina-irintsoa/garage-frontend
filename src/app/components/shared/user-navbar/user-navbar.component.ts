@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { Observable, filter } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
+import { User } from '../../../models/user.interface';
 
 interface NavItem {
   icon: string;
@@ -10,6 +11,7 @@ interface NavItem {
   route: string;
   active?: boolean;
   badge?: string;
+  roles: string[];
 }
 
 @Component({
@@ -22,38 +24,99 @@ interface NavItem {
 export class UserNavbarComponent implements OnInit {
   isExpanded = false;
   isUserMenuOpen = false;
-  currentUser$: Observable<any>;
+  currentUser$: Observable<User | null>;
   darkMode = false;
 
-  navItems: NavItem[] = [
+  private navItems: NavItem[] = [
+    // Éléments pour les clients
     {
-      icon: 'fas fa-calendar',
-      label: 'Calendar',
-      route: '/calendar',
+      icon: 'fas fa-calendar-alt',
+      label: 'Mes Rendez-vous',
+      route: '/BO/appointments',
       active: false,
+      roles: ['CLIENT'],
     },
     {
-      icon: 'fas fa-chart-bar',
-      label: 'Analytics',
-      route: '/analytics',
-      active: false,
-    },
-    {
-      icon: 'fas fa-folder',
-      label: 'Projects',
-      route: '/BO/kanban',
-      active: false,
-    },
-    {
-      icon: 'fas fa-tools',
+      icon: 'fa-solid fa-paper-plane',
       label: 'Mes demandes',
       route: '/BO/mes-demandes',
       active: false,
+      roles: ['CLIENT'],
+    },
+    {
+      icon: 'fas fa-history',
+      label: 'Historique',
+      route: '/BO/history',
+      active: false,
+      roles: ['CLIENT'],
+    },
+    // Éléments pour les mécaniciens
+    {
+      icon: 'fas fa-calendar-check',
+      label: 'Planning',
+      route: '/BO/schedule',
+      active: false,
+      roles: ['MECANICIEN'],
+    },
+    {
+      icon: 'fas fa-tasks',
+      label: 'Tâches',
+      route: '/BO/tasks',
+      active: false,
+      roles: ['MECANICIEN'],
+    },
+    // Éléments pour les managers
+    {
+      icon: 'fas fa-cogs',
+      label: 'Gestion Services',
+      route: '/BO/services',
+      active: false,
+      roles: ['MANAGER'],
+    },
+    {
+      icon: 'fas fa-car',
+      label: 'Marques',
+      route: '/BO/marques',
+      active: false,
+      roles: ['MANAGER'],
+    },
+    {
+      icon: 'fas fa-car-side',
+      label: 'Types de véhicules',
+      route: '/BO/types-vehicules',
+      active: false,
+      roles: ['MANAGER'],
+    },
+    {
+      icon: 'fas fa-users',
+      label: 'Gestion Équipe',
+      route: '/BO/team',
+      active: false,
+      roles: ['MANAGER'],
+    },
+    {
+      icon: 'fas fa-chart-bar',
+      label: 'Statistiques',
+      route: '/BO/stats',
+      active: false,
+      roles: ['MANAGER'],
     },
   ];
 
+  filteredNavItems$: Observable<NavItem[]>;
+
   constructor(private authService: AuthService, private router: Router) {
     this.currentUser$ = this.authService.currentUser$;
+
+    // Filtrer les éléments de navigation en fonction du rôle de l'utilisateur
+    this.filteredNavItems$ = this.currentUser$.pipe(
+      map((user) => {
+        console.log('user role 2', user?.role);
+        return this.navItems.filter((item) =>
+          item.roles.includes(user?.role || '')
+        );
+      })
+    );
 
     // S'abonner aux événements de navigation pour mettre à jour l'état actif
     this.router.events

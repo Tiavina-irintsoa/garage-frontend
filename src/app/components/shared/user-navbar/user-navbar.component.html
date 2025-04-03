@@ -21,15 +21,12 @@
   <!-- Navigation Items -->
   <nav class="flex-1 py-4">
     <ul class="space-y-2">
-      <li *ngFor="let item of navItems">
+      <li *ngFor="let item of filteredNavItems$ | async">
         <a
           [routerLink]="item.route"
           class="flex items-center text-white/80 hover:text-white dark:text-white/80 dark:hover:text-white transition-colors duration-200 px-2 py-2 hover:bg-blue-700 dark:hover:bg-blue-900 rounded-lg"
         >
-          <i [class]="item.icon" style="
-          padding: 0;
-          margin: 0;
-          "></i>
+          <i [class]="item.icon" style="padding: 0; margin: 0"></i>
           <span *ngIf="isExpanded" class="ml-3 text-xs">{{ item.label }}</span>
         </a>
       </li>

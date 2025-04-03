@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
 import { MesDemandesComponent } from './components/dashboard/demandes/mes-demandes/mes-demandes.component';
 import { NouvelleDemandComponent } from './components/dashboard/demandes/nouvelle-demande/nouvelle-demande.component';
 import { HomeLayoutComponent } from './layouts/home-layout/home-layout.component';
 import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/shared/404/404.component';
 import { BoLayoutComponent } from './layouts/bo-layout/bo-layout.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -49,13 +51,30 @@ export const routes: Routes = [
     //TODO: add auth guard
     //canActivate: [authGuard],
     children: [
-      
       {
         path: 'dashboard',
         loadComponent: () =>
           import('./components/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent
           ),
+      },
+      {
+        path: 'marques',
+        loadComponent: () =>
+          import(
+            './components/dashboard/marques/gestion-marques/gestion-marques.component'
+          ).then((m) => m.GestionMarquesComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['MANAGER'] },
+      },
+      {
+        path: 'types-vehicules',
+        loadComponent: () =>
+          import(
+            './components/dashboard/types-vehicules/gestion-types-vehicules/gestion-types-vehicules.component'
+          ).then((m) => m.GestionTypesVehiculesComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['MANAGER'] },
       },
       {
         path: '',
@@ -70,16 +89,16 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () =>
-              import('./components/dashboard/demandes/mes-demandes/mes-demandes.component').then(
-                (m) => m.MesDemandesComponent
-              ),
+              import(
+                './components/dashboard/demandes/mes-demandes/mes-demandes.component'
+              ).then((m) => m.MesDemandesComponent),
           },
           {
             path: 'nouvelle-demande',
             loadComponent: () =>
-              import('./components/dashboard/demandes/nouvelle-demande/nouvelle-demande.component').then(
-                (m) => m.NouvelleDemandComponent
-              ),
+              import(
+                './components/dashboard/demandes/nouvelle-demande/nouvelle-demande.component'
+              ).then((m) => m.NouvelleDemandComponent),
           },
         ],
       },
@@ -92,6 +111,15 @@ export const routes: Routes = [
       },
     ],
   },
+  // {
+  //   path: 'BO/gestion/marques',
+  //   loadComponent: () =>
+  //     import(
+  //       './components/dashboard/marques/gestion-marques/gestion-marques.component'
+  //     ).then((m) => m.GestionMarquesComponent),
+  //   canActivate: [ roleGuard],
+  //   data: { roles: ['MANAGER'] },
+  // },
   {
     path: '**',
     component: NotFoundComponent,
