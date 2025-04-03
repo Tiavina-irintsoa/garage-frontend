@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ServiceService } from '../../services/service.service';
 import { Service } from '../../models/service.interface';
 
@@ -15,20 +15,29 @@ export class HomeComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  constructor(private serviceService: ServiceService) {}
+  constructor(
+    private serviceService: ServiceService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
-    this.loadServices();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadServices();
+    } else {
+      this.isLoading = false;
+    }
   }
 
-  private loadServices() {
-    this.serviceService.getAllServices().subscribe({
-      next: (services) => {
-        this.services = services;
+  loadServices(): void {
+    this.serviceService.getServices().subscribe({
+      next: (response) => {
+        if (response.data?.services) {
+          this.services = response.data.services;
+        }
         this.isLoading = false;
       },
-      error: (error) => {
-        this.error = 'Erreur lors du chargement des services';
+      error: (error: Error) => {
+        console.error('Erreur lors du chargement des services:', error);
         this.isLoading = false;
       },
     });

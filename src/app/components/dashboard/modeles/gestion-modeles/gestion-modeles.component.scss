@@ -1,0 +1,35 @@
+// Styles spécifiques au composant de gestion des modèles
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Style pour les boutons d'action
+button {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Style pour les cellules du tableau en mode édition
+td input,
+td select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+
+  &:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+  }
+}
+
+// Style pour les messages d'erreur
+.error-message {
+  color: #e53e3e;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}

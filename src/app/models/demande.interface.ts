@@ -97,6 +97,7 @@ export interface Demande {
   description: string;
   description_html: string; // Contenu HTML enrichi
   images: ImageDemande[]; // Liste des images associées
+  photos: string[]; // URLs des photos uploadées
   statut: string;
   dateCreation: string;
   date_rdv: string;

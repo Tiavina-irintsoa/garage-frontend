@@ -57,3 +57,129 @@ input[type="time"] {
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
+
+.form-header {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #4a5568;
+    line-height: 1.5;
+  }
+}
+
+.rdv-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #2d3748;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: #cbd5e0;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    }
+
+    &:disabled {
+      background-color: #f7fafc;
+      cursor: not-allowed;
+    }
+
+    &.ng-invalid.ng-touched {
+      border-color: #fc8181;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.2);
+      }
+    }
+  }
+}
+
+.error-message {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #c53030;
+  background-color: #fff5f5;
+  border: 1px solid #fc8181;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &.btn-secondary {
+      background-color: #edf2f7;
+      color: #2d3748;
+
+      &:hover:not(:disabled) {
+        background-color: #e2e8f0;
+      }
+    }
+
+    &.btn-primary {
+      background-color: #4299e1;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: #3182ce;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

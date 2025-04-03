@@ -2,6 +2,8 @@ import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NouvelleDemandService } from '../../../../../../services/nouvelle-demande.service';
+import { DemandeService } from '../../../../../../services/demande.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rendez-vous-form',
@@ -19,6 +21,7 @@ export class RendezVousFormComponent implements OnInit {
   heure_rdv: string = '';
   error: string | null = null;
   isValid: boolean = false;
+  isSubmitting: boolean = false;
 
   // Date minimum (aujourd'hui)
   minDate: string = new Date().toISOString().split('T')[0];
@@ -28,7 +31,11 @@ export class RendezVousFormComponent implements OnInit {
     .toISOString()
     .split('T')[0];
 
-  constructor(private nouvelleDemandService: NouvelleDemandService) {}
+  constructor(
+    private nouvelleDemandService: NouvelleDemandService,
+    private demandeService: DemandeService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // Récupérer les données sauvegardées si elles existent
@@ -45,7 +52,6 @@ export class RendezVousFormComponent implements OnInit {
 
   onDateChange(value: string): void {
     this.date_rdv = value;
-    console.log('new formData : ', this.nouvelleDemandService.getFormData());
     this.validateForm();
   }
 
@@ -92,19 +98,55 @@ export class RendezVousFormComponent implements OnInit {
 
   onSubmit(): void {
     this.validateForm();
-    console.log('Final Data ', this.nouvelleDemandService.getFormData());
-    if (this.isValid) {
+    if (this.isValid && !this.isSubmitting) {
+      this.isSubmitting = true;
+      this.error = null;
+
+      // Mettre à jour les données du rendez-vous
       this.nouvelleDemandService.updateRendezVousData(
         this.date_rdv,
         this.heure_rdv
       );
-      this.stepComplete.emit();
+
+      const formData = this.nouvelleDemandService.getFormData();
+
+      // Vérifier si nous avons des fichiers à uploader
+      if (formData._tempFiles?.files) {
+        this.demandeService
+          .submitDemande(formData, formData._tempFiles.files)
+          .subscribe({
+            next: (response) => {
+              console.log('Demande créée avec succès:', response);
+              this.nouvelleDemandService.resetForm();
+              this.router.navigate(['/BO/mes-demandes']);
+            },
+            error: (error) => {
+              console.error('Erreur lors de la création de la demande:', error);
+              this.error =
+                'Une erreur est survenue lors de la création de la demande. Veuillez réessayer.';
+              this.isSubmitting = false;
+            },
+          });
+      } else {
+        // Cas où il n'y a pas d'images
+        this.demandeService.createDemande(formData, []).subscribe({
+          next: (response) => {
+            console.log('Demande créée avec succès:', response);
+            this.nouvelleDemandService.resetForm();
+            this.router.navigate(['/BO/mes-demandes']);
+          },
+          error: (error) => {
+            console.error('Erreur lors de la création de la demande:', error);
+            this.error =
+              'Une erreur est survenue lors de la création de la demande. Veuillez réessayer.';
+            this.isSubmitting = false;
+          },
+        });
+      }
     }
   }
 
   onPreviousStep(): void {
-    console.log(' data ', this.nouvelleDemandService.getFormData());
-
     if (this.date_rdv || this.heure_rdv) {
       this.nouvelleDemandService.updateRendezVousData(
         this.date_rdv,

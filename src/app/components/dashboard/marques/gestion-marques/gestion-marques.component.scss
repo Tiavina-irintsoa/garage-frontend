@@ -1,0 +1,87 @@
+// Styles pour les inputs en focus
+input:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+// Animation pour le spinner de chargement
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Styles pour les transitions des boutons
+button {
+  transition: all 0.2s ease-in-out;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Styles pour le tableau
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th,
+  td {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease;
+  }
+
+  tr:hover td {
+    background-color: #f9fafb;
+  }
+}
+
+// Styles pour les icônes d'action
+.action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// Styles pour la pagination
+.pagination-button {
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &.active {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// Styles pour les messages d'erreur
+.error-message {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

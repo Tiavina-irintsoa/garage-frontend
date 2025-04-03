@@ -15,6 +15,7 @@ import {
   EstimationResponse,
 } from '../../../../../../services/estimation.service';
 import { NumberFormatPipe } from '../../../../../../pipes/number-format.pipe';
+import { ServiceResponse } from '../../../../../../models/service.interface';
 
 @Component({
   selector: 'app-services-form',
@@ -29,7 +30,7 @@ export class ServicesFormComponent implements OnInit {
   @Output() previousStep = new EventEmitter<void>();
 
   servicesForm: FormGroup;
-  availableServices: Service[] = [];
+  services: Service[] = [];
   selectedServices: DemandeService[] = [];
   filteredServices: Service[] = [];
   isLoading = true;
@@ -54,7 +55,19 @@ export class ServicesFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadServices();
+    this.serviceService.getServices().subscribe({
+      next: (response: ServiceResponse) => {
+        if (response.data?.services) {
+          this.services = response.data.services;
+          this.filteredServices = response.data.services;
+          this.isLoading = false;
+        }
+      },
+      error: (error: Error) => {
+        console.error('Erreur lors du chargement des services:', error);
+        this.isLoading = false;
+      },
+    });
 
     // S'abonner aux données du formulaire
     this.nouvelleDemandService.formData$.subscribe((data) => {
@@ -67,20 +80,6 @@ export class ServicesFormComponent implements OnInit {
           );
         }
       }
-    });
-  }
-
-  private loadServices(): void {
-    this.serviceService.getAllServices().subscribe({
-      next: (services) => {
-        this.availableServices = services;
-        this.filteredServices = services;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.error = 'Erreur lors du chargement des services';
-        this.isLoading = false;
-      },
     });
   }
 
@@ -110,32 +109,29 @@ export class ServicesFormComponent implements OnInit {
 
   private filterServices(value: string): void {
     if (!value) {
-      this.filteredServices = this.availableServices.filter(
+      this.filteredServices = this.services.filter(
         (service) =>
           !this.selectedServices.find((s) => s.titre === service.titre)
       );
       return;
     }
 
-    this.filteredServices = this.availableServices.filter(
+    this.filteredServices = this.services.filter(
       (service) =>
         service.titre.toLowerCase().includes(value.toLowerCase()) &&
         !this.selectedServices.find((s) => s.titre === service.titre)
     );
   }
 
-  // Convertir Service en DemandeService
-  private convertToDemandeService(service: Service): DemandeService {
-    return {
+  addService(service: Service): void {
+    if (!service.id) return;
+
+    const demandeService: DemandeService = {
       id: service.id,
       titre: service.titre,
       description: service.description,
       icone: service.icone,
     };
-  }
-
-  addService(service: Service): void {
-    const demandeService = this.convertToDemandeService(service);
     this.selectedServices.push(demandeService);
     this.servicesForm.get('searchService')?.setValue('');
     this.error = null;

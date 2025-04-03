@@ -1,111 +1,141 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-blue-primary">
-      Mes demandes de service
-    </h2>
+<div class="container mx-auto px-4 py-8">
+  <!-- Header with title and create button -->
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Mes demandes</h1>
     <a
       [routerLink]="['/BO/mes-demandes/nouvelle-demande']"
-      class="cursor-pointer flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
     >
       <i class="fas fa-plus"></i>
       Nouvelle demande
     </a>
   </div>
 
-  <!-- Loading State -->
+  <!-- Loading state -->
   <div *ngIf="isLoading" class="flex justify-center items-center h-64">
     <div
-      class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-primary"
+      class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
     ></div>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="error" class="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
+  <!-- Error state -->
+  <div
+    *ngIf="error"
+    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+  >
     {{ error }}
   </div>
 
-  <!-- Demandes List -->
-  <div *ngIf="!isLoading && !error" class="space-y-4">
+  <!-- Empty state -->
+  <div
+    *ngIf="!isLoading && !error && demandes.length === 0"
+    class="text-center py-8"
+  >
+    <p class="text-gray-600">Vous n'avez pas encore de demandes</p>
+  </div>
+
+  <!-- List of demands -->
+  <div *ngIf="!isLoading && !error && demandes.length > 0" class="space-y-6">
     <div
       *ngFor="let demande of demandes"
-      class="bg-white rounded-xl shadow-lg p-6"
+      class="bg-white rounded-lg shadow-md p-6 border-2 border-blue-500 hover:bg-gray-100 transition-colors duration-200"
     >
-      <!-- En-tête de la demande -->
+      <!-- Header -->
       <div class="flex justify-between items-start mb-4">
         <div>
-          <h3 class="text-xl font-semibold text-blue-primary">
+          <h2 class="text-xl font-semibold text-blue-500">
             {{ demande.vehicule.marque.libelle }}
             {{ demande.vehicule.modele.libelle }}
-          </h3>
+          </h2>
           <p class="text-gray-600">
-            {{ demande.vehicule.immatriculation }}
+            {{ demande.dateCreation | date : "dd/MM/yyyy" }}
           </p>
         </div>
         <span
-          [class]="getStatusClass(demande.statut)"
-          class="px-3 py-1 rounded-full text-sm font-medium"
+          [class]="
+            'px-3 py-1 rounded-full text-sm font-medium ' +
+            getStatusClass(demande.statut)
+          "
         >
           {{ demande.statut }}
         </span>
       </div>
 
-      <!-- Services demandés -->
+      <!-- Vehicle Info -->
       <div class="mb-4">
-        <h4 class="font-medium text-gray-700 mb-2">Services demandés :</h4>
+        <p class="text-gray-700">
+          <span class="font-medium">Immatriculation:</span>
+          <span class=" bg-blue-500 py-1 px-2 ml-1.5 rounded-sm text-white">{{ demande.vehicule.immatriculation }}</span>
+        </p>
+        <p class="text-gray-700">
+          <span class="font-medium">Type:</span>
+          {{ demande.vehicule.type.libelle }}
+        </p>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-4">
+        <h3 class="text-lg font-medium mb-2">Description</h3>
+        <p class="text-gray-700 description-text">
+          {{ demande.description }}
+        </p>
+      </div>
+
+      <!-- Photos Gallery -->
+      <div *ngIf="demande.photos && demande.photos.length > 0" class="mb-4">
+        <h3 class="text-lg font-medium mb-2">Photos</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div *ngFor="let photo of demande.photos" class="relative group">
+            <img
+              [src]="photo"
+              alt="Photo du véhicule"
+              class="w-full h-32 object-cover rounded-lg cursor-pointer"
+              (click)="openPhotoViewer(photo)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <div class="mb-4">
+        <h3 class="text-lg font-medium mb-2">Services demandés</h3>
         <div class="flex flex-wrap gap-2">
           <span
             *ngFor="let service of demande.services"
-            class="bg-blue-50 text-blue-primary px-3 py-1 rounded-full text-sm"
+            class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
           >
             {{ service.titre }}
           </span>
         </div>
       </div>
 
-      <!-- Informations de rendez-vous -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <p class="text-gray-600">
-            Date de rendez-vous :
-            <span class="font-medium">
-              {{ demande.date_rdv | date : "dd/MM/yyyy" }}
-            </span>
-          </p>
-        </div>
-        <div>
-          <p class="text-gray-600">
-            Heure :
-            <span class="font-medium">{{ demande.heure_rdv }}</span>
-          </p>
-        </div>
+      <!-- Rendez-vous -->
+      <div class="mb-4">
+        <p class="text-gray-700">
+          <span class="font-medium">Rendez-vous:</span>
+          {{ demande.date_rdv | date : "dd/MM/yyyy" }} à {{ demande.heure_rdv }}
+        </p>
       </div>
 
-      <!-- Estimation -->
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <h4 class="font-medium text-gray-700 mb-2">Estimation :</h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <p class="text-gray-600">
-            Coût estimé :
-            <span class="font-medium"
-              >{{ demande.estimation.cout_estime }}€</span
-            >
-          </p>
-          <p class="text-gray-600">
-            Temps estimé :
-            <span class="font-medium"
-              >{{ demande.estimation.temps_estime }}h</span
-            >
-          </p>
-        </div>
+      <!-- Actions -->
+      <div class="flex justify-end mt-4">
+        <a
+          [routerLink]="['/BO/demandes', demande.id]"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+        >
+          Voir les détails
+        </a>
       </div>
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div
-    *ngIf="!isLoading && !error && demandes.length === 0"
-    class="text-center text-gray-600 p-8"
-  >
-    Vous n'avez pas encore de demandes de service.
+  <!-- Photo Viewer -->
+  <div *ngIf="currentPhoto" class="photo-viewer" (click)="closePhotoViewer()">
+    <img
+      [src]="currentPhoto"
+      alt="Photo en plein écran"
+      (click)="$event.stopPropagation()"
+    />
+    <button class="photo-viewer-close" (click)="closePhotoViewer()">×</button>
   </div>
 </div>
