@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { DashboardService } from '../../../../services/dashboard.service';
+import { forkJoin } from 'rxjs';
 
 Chart.register(...registerables);
 
@@ -16,6 +18,7 @@ Chart.register(...registerables);
 export class AdminDashboardComponent implements OnInit {
   selectedYear: number = new Date().getFullYear();
   years: number[] = [];
+  isLoading = true;
 
   // Configuration du graphique CA
   revenueChartData: ChartConfiguration<'line'>['data'] = {
@@ -35,10 +38,7 @@ export class AdminDashboardComponent implements OnInit {
     ],
     datasets: [
       {
-        data: [
-          150000, 180000, 210000, 190000, 250000, 280000, 300000, 290000,
-          320000, 350000, 380000, 400000,
-        ],
+        data: [],
         label: "Chiffre d'affaires (Ar)",
         fill: true,
         tension: 0.5,
@@ -86,7 +86,7 @@ export class AdminDashboardComponent implements OnInit {
     ],
     datasets: [
       {
-        data: [25, 30, 35, 28, 42, 38, 45, 40, 48, 50, 55, 60],
+        data: [],
         label: "Nombre d'inscriptions",
         backgroundColor: 'rgb(147, 51, 234)',
         borderColor: 'rgb(147, 51, 234)',
@@ -106,23 +106,22 @@ export class AdminDashboardComponent implements OnInit {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 10,
+          stepSize: 1,
         },
       },
     },
   };
 
-  // Données pour le graphique des performances (inchangé)
-  servicePerformanceData = {
+  // Données pour le graphique des performances
+  servicePerformanceData: {
+    title: string;
+    services: Array<{ name: string; value: number }>;
+  } = {
     title: 'Performance des services',
-    services: [
-      { name: 'Réparation moteur', value: 35 },
-      { name: 'Changement huile', value: 25 },
-      { name: 'Diagnostic', value: 20 },
-      { name: 'Entretien général', value: 15 },
-      { name: 'Autres', value: 5 },
-    ],
+    services: [],
   };
+
+  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
     // Générer la liste des années (5 ans en arrière jusqu'à l'année actuelle)
@@ -130,10 +129,44 @@ export class AdminDashboardComponent implements OnInit {
     for (let year = currentYear - 5; year <= currentYear; year++) {
       this.years.push(year);
     }
+
+    this.loadDashboardData();
   }
 
   onYearChange() {
-    // Cette méthode sera utilisée plus tard pour charger les données de l'année sélectionnée
-    console.log('Année sélectionnée:', this.selectedYear);
+    this.loadDashboardData();
+  }
+
+  private loadDashboardData() {
+    this.isLoading = true;
+
+    forkJoin({
+      revenue: this.dashboardService.getChiffreAffaire(this.selectedYear),
+      registrations: this.dashboardService.getInscriptions(this.selectedYear),
+      services: this.dashboardService.getServicesPerformance(this.selectedYear),
+    }).subscribe({
+      next: (data) => {
+        // Mise à jour du graphique Chiffre d'affaires
+        this.revenueChartData.datasets[0].data = data.revenue.chiffreAffaire;
+
+        // Mise à jour du graphique Inscriptions
+        this.registrationsChartData.datasets[0].data =
+          data.registrations.inscriptions;
+
+        // Mise à jour des performances des services
+        this.servicePerformanceData.services = data.services.services.map(
+          (service) => ({
+            name: service.titre,
+            value: parseFloat(service.pourcentage),
+          })
+        );
+
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des données:', error);
+        this.isLoading = false;
+      },
+    });
   }
 }
