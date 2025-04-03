@@ -78,6 +78,13 @@ interface KanbanCard {
   invoiceUrl?: string;
 }
 
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+}
+
 @Component({
   selector: 'app-kanban',
   standalone: true,
