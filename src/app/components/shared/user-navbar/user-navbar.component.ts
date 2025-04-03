@@ -82,7 +82,7 @@ export class UserNavbarComponent implements OnInit {
     },
     // Éléments pour les managers
     {
-      icon: 'fas fa-cogs',
+      icon: 'fas fa-tools',
       label: 'Services',
       route: '/BO/services',
       active: false,
@@ -121,6 +121,13 @@ export class UserNavbarComponent implements OnInit {
       icon: 'fas fa-chart-bar',
       label: 'Statistiques',
       route: '/BO/stats',
+      active: false,
+      roles: ['MANAGER'],
+    },
+    {
+      icon: 'fas fa-cogs',
+      label: 'Pièces',
+      route: '/BO/pieces',
       active: false,
       roles: ['MANAGER'],
     },

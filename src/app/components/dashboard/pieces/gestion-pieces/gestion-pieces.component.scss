@@ -1,0 +1,72 @@
+// Styles pour les champs de formulaire
+.form-control.ng-invalid.ng-touched {
+  border: 2px solid #ef4444;
+}
+
+// Styles pour les messages d'erreur
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+// Styles pour le tableau
+table {
+  th {
+    font-weight: 600;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Styles pour les boutons d'action
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+// Styles pour la pagination
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button:not(:disabled):hover {
+  background-color: #f9fafb;
+}
+
+// Animation de chargement
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+// Styles pour les messages d'erreur globaux
+.error {
+  color: #ef4444;
+}
+
+// Focus styles pour les inputs et textareas
+input:focus,
+textarea:focus {
+  border: 2px solid #3b82f6;
+  outline: none;
+}
+
+// Styles responsifs
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  table {
+    font-size: 0.875rem;
+  }
+}
