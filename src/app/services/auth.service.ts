@@ -17,7 +17,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
@@ -28,12 +28,16 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpService, private httpClient: HttpClient) {
+  constructor(
+    private http: HttpService,
+    private httpClient: HttpClient,
+    private router: Router
+  ) {
     if (isPlatformBrowser(this.platformId)) {
       this.checkAuthStatus();
       const token = localStorage.getItem('access_token');
       this.isAuthenticatedSubject.next(!!token);
-    }    
+    }
   }
 
   private checkAuthStatus(): void {
@@ -128,6 +132,22 @@ export class AuthService {
     );
   }
 
+  private setSession(authResult: any): void {
+    localStorage.setItem('token', authResult.token);
+    localStorage.setItem('user', JSON.stringify(authResult.user));
+  }
+
+  adminLogin(credentials: {
+    email: string;
+    password: string;
+  }): Observable<any> {
+    return this.http.post(`/auth/login`, credentials).pipe(
+      tap((response: any) => {
+        this.setSession(response);
+      })
+    );
+  }
+
   private fetchUserDetails(userId: string): void {
     this.http
       .authenticatedGet<{ data: { user: User } }>(`/auth/users/${userId}`)
@@ -153,6 +173,7 @@ export class AuthService {
     this.currentUserSubject.next(null);
     localStorage.removeItem('access_token');
     this.isAuthenticatedSubject.next(false);
+    // this.router.navigate(['/']);
   }
 
   isLoggedIn(): boolean {
@@ -172,13 +193,15 @@ export class AuthService {
       redirect_uri=${encodeURIComponent(environment.redirectUri)}&
       access_type=offline&
       prompt=consent`;
-    
+
     const cleanUrl = googleAuthUrl.replace(/\s+/g, '');
     window.location.href = cleanUrl;
   }
 
   handleGoogleCallback(code: string): Observable<any> {
-    return this.httpClient.post(`${environment.apiUrl}/auth/google/callback`, { code });
+    return this.httpClient.post(`${environment.apiUrl}/auth/google/callback`, {
+      code,
+    });
   }
 
   setAuthenticated(token: string): void {

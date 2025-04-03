@@ -167,6 +167,7 @@ export class UserNavbarComponent implements OnInit {
 
   onLogout(): void {
     this.authService.logout();
+    this.router.navigate(['/']);
   }
 
   // Méthode utilitaire pour obtenir les classes CSS en fonction de l'état actif

@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { User } from '../../../models/user.interface';
+import { User, UserRole } from '../../../models/user.interface';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
@@ -16,6 +16,10 @@ export class NavbarComponent implements OnInit {
   isMobileMenuOpen = false;
   isUserMenuOpen = false;
   currentUser$: Observable<User | null>;
+
+  private readonly USER_ROLE: UserRole = UserRole.CLIENT;
+  private readonly ADMIN_ROLE: UserRole = UserRole.MANAGER;
+  private readonly MANAGER_ROLE: UserRole = UserRole.MANAGER;
 
   constructor(private router: Router, private authService: AuthService) {
     this.currentUser$ = this.authService.currentUser$;
@@ -41,5 +45,24 @@ export class NavbarComponent implements OnInit {
     this.authService.logout();
     this.isUserMenuOpen = false; // Fermer le menu déroulant
     this.router.navigate(['/']);
+  }
+
+  goToBO(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
+
+    switch (user.role) {
+      case this.USER_ROLE:
+        this.router.navigate(['/BO/mes-demandes']);
+        break;
+      case this.ADMIN_ROLE:
+        this.router.navigate(['/BO/services']);
+        break;
+      case this.MANAGER_ROLE:
+        this.router.navigate(['/BO/dashboard']);
+        break;
+      default:
+        this.router.navigate(['/BO/mes-demandes']); // Route par défaut
+    }
   }
 }

@@ -43,6 +43,13 @@ export const routes: Routes = [
             (m) => m.VerifyComponent
           ),
       },
+      {
+        path: '52Rz1gT9@n',
+        loadComponent: () =>
+          import('./components/auth/admin-login/admin-login.component').then(
+            (m) => m.AdminLoginComponent
+          ),
+      },
     ],
   },
   {

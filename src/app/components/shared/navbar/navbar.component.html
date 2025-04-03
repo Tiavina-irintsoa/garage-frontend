@@ -18,6 +18,15 @@
         >
           Tarifs
         </a>
+        <ng-container *ngIf="currentUser$ | async">
+          <a
+            [routerLink]="['/BO/dashboard']"
+            class="text-gray-600 hover:text-blue-primary transition-colors duration-300 flex items-center"
+          >
+            <i class="fas fa-user-circle mr-2"></i>
+            Espace membre
+          </a>
+        </ng-container>
       </div>
 
       <!-- Login/User Button -->
@@ -44,7 +53,7 @@
           <!-- User Dropdown Menu -->
           <div
             *ngIf="isUserMenuOpen"
-            class="absolute right-0 mt-2 bg-white rounded-xl shadow-lg py-2 z-50"
+            class="absolute right-0 mt-2 bg-white rounded-xl shadow-lg py-2 z-50 w-48"
           >
             <div class="px-4 py-2 border-b border-gray-100">
               <p class="text-sm font-medium text-gray-900">
@@ -52,6 +61,13 @@
               </p>
               <p class="text-sm text-gray-500">{{ user.email }}</p>
             </div>
+            <a
+              [routerLink]="['/BO/dashboard']"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+            >
+              <i class="fas fa-user-circle mr-2"></i>
+              Espace membre
+            </a>
             <button
               (click)="onLogout()"
               class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center"
@@ -96,6 +112,15 @@
         >
           Tarifs
         </a>
+        <ng-container *ngIf="currentUser$ | async">
+          <a
+            [routerLink]="['/BO/dashboard']"
+            class="block text-gray-600 hover:text-blue-primary transition-colors duration-300"
+          >
+            <i class="fas fa-user-circle mr-2"></i>
+            Espace membre
+          </a>
+        </ng-container>
       </div>
     </div>
   </div>
