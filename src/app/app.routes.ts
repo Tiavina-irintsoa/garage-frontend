@@ -109,6 +109,15 @@ export const routes: Routes = [
         data: { roles: ['MANAGER'] },
       },
       {
+        path: 'pieces',
+        loadComponent: () =>
+          import(
+            './components/dashboard/pieces/gestion-pieces/gestion-pieces.component'
+          ).then((m) => m.GestionPiecesComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['MANAGER'] },
+      },
+      {
         path: '',
         loadComponent: () =>
           import('./components/dashboard/overview/overview.component').then(
