@@ -46,7 +46,7 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
 })
 export class ToastComponent {
   @Input() message: string = '';
-  @Input() type: 'success' | 'error' | 'info' = 'info';
+  @Input() type: ToastType = 'info';
   @Input() show: boolean = false;
   @Output() closed = new EventEmitter<void>();
 
@@ -55,6 +55,7 @@ export class ToastComponent {
       'bg-green-500 text-white': this.type === 'success',
       'bg-red-500 text-white': this.type === 'error',
       'bg-blue-500 text-white': this.type === 'info',
+      'bg-yellow-500 text-white': this.type === 'warning',
     };
   }
 

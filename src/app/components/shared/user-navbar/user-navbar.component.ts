@@ -44,6 +44,13 @@ export class UserNavbarComponent implements OnInit {
       roles: ['CLIENT'],
     },
     {
+      icon: 'fas fa-wrench',
+      label: 'Services',
+      route: '/BO/services',
+      active: false,
+      roles: ['CLIENT'],
+    },
+    {
       icon: 'fas fa-history',
       label: 'Historique',
       route: '/BO/history',
@@ -68,7 +75,7 @@ export class UserNavbarComponent implements OnInit {
     // Éléments pour les managers
     {
       icon: 'fas fa-cogs',
-      label: 'Gestion Services',
+      label: 'Services',
       route: '/BO/services',
       active: false,
       roles: ['MANAGER'],
