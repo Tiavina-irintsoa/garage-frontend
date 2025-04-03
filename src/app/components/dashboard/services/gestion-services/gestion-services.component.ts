@@ -5,11 +5,12 @@ import { ServiceService } from '../../../../services/service.service';
 import { Service } from '../../../../models/service.interface';
 import { ToastService } from '../../../../services/toast.service';
 import { ToastComponent } from '../../../shared/toast/toast.component';
+import { IconPickerComponent } from '../../../../shared/icon-picker/icon-picker.component';
 
 @Component({
   selector: 'app-gestion-services',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent],
+  imports: [CommonModule, FormsModule, ToastComponent, IconPickerComponent],
   templateUrl: './gestion-services.component.html',
   styleUrls: ['./gestion-services.component.scss'],
 })

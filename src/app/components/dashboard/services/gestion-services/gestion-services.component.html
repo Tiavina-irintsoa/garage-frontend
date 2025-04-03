@@ -26,16 +26,12 @@
       </div>
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="icone">
-          Icône (Font Awesome)
+          Icône
         </label>
-        <input
-          type="text"
-          id="icone"
-          [(ngModel)]="newService.icone"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          [disabled]="isLoading"
-          placeholder="fas fa-wrench"
-        />
+        <app-icon-picker
+          [selectedIcon]="newService.icone"
+          (iconSelected)="newService.icone = $event"
+        ></app-icon-picker>
       </div>
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="cout">
@@ -169,13 +165,10 @@
                   (ngModelChange)="editingService!.titre = $event"
                   class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                <input
-                  type="text"
-                  [ngModel]="editingService?.icone"
-                  (ngModelChange)="editingService!.icone = $event"
-                  class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="fas fa-wrench"
-                />
+                <app-icon-picker
+                  [selectedIcon]="editingService?.icone || ''"
+                  (iconSelected)="editingService!.icone = $event"
+                ></app-icon-picker>
               </div>
             </td>
             <td class="px-6 py-4">
