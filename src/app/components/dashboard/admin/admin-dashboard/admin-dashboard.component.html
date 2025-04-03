@@ -1,0 +1,68 @@
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-8">Dashboard Administrateur</h1>
+
+  <!-- Sélecteur d'année -->
+  <div class="mb-6 flex flex-direction-row items-center gap-2">
+    <label for="yearSelect" class="block text-sm font-medium text-gray-700"
+      >Sélectionner l'année :</label
+    >
+    <select
+      id="yearSelect"
+      [(ngModel)]="selectedYear"
+      (change)="onYearChange()"
+      class="block w-48 h-10 px-4 bg-white rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+    >
+      @for (year of years; track year) {
+      <option [value]="year">{{ year }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Grid Layout -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Graphique Chiffre d'affaires -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <canvas
+        baseChart
+        [type]="'line'"
+        [data]="revenueChartData"
+        [options]="revenueChartOptions"
+      >
+      </canvas>
+    </div>
+
+    <!-- Graphique Inscriptions -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <canvas
+        baseChart
+        [type]="'bar'"
+        [data]="registrationsChartData"
+        [options]="registrationsChartOptions"
+      >
+      </canvas>
+    </div>
+
+    <!-- Performance des services -->
+    <div class="bg-white rounded-lg shadow-lg p-6 md:col-span-2">
+      <h2 class="text-xl font-semibold mb-6">
+        {{ servicePerformanceData.title }}
+      </h2>
+      <div class="space-y-4">
+        @for (service of servicePerformanceData.services; track service.name) {
+        <div class="relative">
+          <div class="flex justify-between mb-1">
+            <span>{{ service.name }}</span>
+            <span>{{ service.value }}%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              class="bg-blue-600 h-2.5 rounded-full"
+              [style.width]="service.value + '%'"
+            ></div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

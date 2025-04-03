@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.container {
+  @media (min-width: 768px) {
+    max-width: 1280px;
+  }
+}
+
+// Animation pour les barres de progression
+.bg-blue-600 {
+  transition: width 0.5s ease-in-out;
+}
+
+// Hover effects pour les cards
+.bg-white {
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Style pour les icônes
+.fas {
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
+}
