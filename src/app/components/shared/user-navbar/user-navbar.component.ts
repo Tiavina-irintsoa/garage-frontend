@@ -47,7 +47,7 @@ export class UserNavbarComponent implements OnInit {
     {
       icon: 'fas fa-tools',
       label: 'Mes demandes',
-      route: '/mes-demandes',
+      route: '/BO/mes-demandes',
       active: false,
     },
   ];
