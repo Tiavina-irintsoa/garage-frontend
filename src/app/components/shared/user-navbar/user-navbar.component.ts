@@ -28,6 +28,14 @@ export class UserNavbarComponent implements OnInit {
   darkMode = false;
 
   private navItems: NavItem[] = [
+    // Éléments pour l'administrateur
+    {
+      icon: 'fas fa-chart-line',
+      label: 'Dashboard',
+      route: '/BO/admin/dashboard',
+      active: false,
+      roles: ['MANAGER'],
+    },
     // Éléments pour les clients
     {
       icon: 'fas fa-calendar-alt',
@@ -94,6 +102,7 @@ export class UserNavbarComponent implements OnInit {
       active: false,
       roles: ['MANAGER'],
     },
+
     {
       icon: 'fas fa-truck-monster',
       label: 'Types de véhicules',
