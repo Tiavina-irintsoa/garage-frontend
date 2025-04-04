@@ -74,63 +74,53 @@ export interface RepairResponse {
 
 export interface RepairDetail {
   id: string;
-  id_personne: string;
-  vehicule: {
-    marque: { id: string; libelle: string };
-    modele: { id: string; libelle: string };
-    couleur: string;
-    type: { id: string; libelle: string };
-    immatriculation: string;
-    etatVehicule: string;
-  };
-  detailServiceIds: string[];
-  estimation: {
-    cout_estime: number;
-    temps_estime: number;
-    details: {
-      facteur_etat: number;
-      coefficient_type: number;
-    };
-  };
-  description: string;
-  date_rdv: string;
-  heure_rdv: string;
-  deadline: string;
-  images: string[];
-  photos: string[];
-  dateCreation: string;
-  date_facturation: string | null;
-  statut: string;
-  reference_paiement?: string;
-  pieces_facture?: Array<{
-    id: string;
-    prix: number;
-    quantite: number;
-    reference?: string;
-    nom?: string;
-    description?: string;
-  }>;
-  montant_pieces?: number;
-  montant_total?: number;
-  user: {
+  client: {
     id: string;
     nom: string;
     prenom: string;
     email: string;
   };
+  vehicule: {
+    id: string;
+    immatriculation: string;
+    marque: {
+      id: string;
+      libelle: string;
+    };
+    modele: {
+      id: string;
+      libelle: string;
+    };
+  };
+  date_rdv: string;
+  description: string;
+  deadline: string;
+  estimation: {
+    cout_estime: number;
+    details: {
+      coefficient_type: number;
+      facteur_etat: number
+    };
+  };
   services: Array<{
     id: string;
     titre: string;
-    description: string;
-    icone: string;
-    tachesParDefaut: any[];
-    cout_base: number;
     temps_base: number;
-    createdAt: string;
-    updatedAt: string;
-    pieces: string[];
+    cout_base: number;
   }>;
-  taches: any[];
+  pieces_facture?: Array<{
+    id: string;
+    reference?: string;
+    nom?: string;
+    description?: string;
+    prix: number;
+    quantite: number;
+  }>;
+  montant_pieces?: number;
+  montant_total?: number;
+  date_facturation?: string;
+  reference_paiement?: string;
+  images?: string[];
 }
 
 export interface RepairDetailResponse {

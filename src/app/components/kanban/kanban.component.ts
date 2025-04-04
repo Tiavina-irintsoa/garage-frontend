@@ -19,6 +19,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 import { PieceService } from '../../services/piece.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PdfService } from '../../services/pdf.service';
 
 interface TeamMember {
   id: string;
@@ -181,7 +182,8 @@ export class KanbanComponent implements OnInit {
     private repairService: RepairService,
     private sanitizer: DomSanitizer,
     private http: HttpClient,
-    private pieceService: PieceService
+    private pieceService: PieceService,
+    private pdfService: PdfService
   ) {
     // Configuration de l'autocomplétion
     this.partsSearchControl.valueChanges
@@ -425,13 +427,20 @@ export class KanbanComponent implements OnInit {
         const repair = response.data.demande;
 
         // Convertir les services en format attendu par la modal
-        const services: Service[] = repair.services.map((service) => ({
-          id: service.id,
-          type: this.mapServiceType(service.titre),
-          estimatedDuration: service.temps_base,
-          estimatedPrice: service.cout_base,
-          tasks: [],
-        }));
+        const services: Service[] = repair.services.map(
+          (service: {
+            id: string;
+            titre: string;
+            temps_base: number;
+            cout_base: number;
+          }) => ({
+            id: service.id,
+            type: this.mapServiceType(service.titre),
+            estimatedDuration: service.temps_base,
+            estimatedPrice: service.cout_base,
+            tasks: [],
+          })
+        );
 
         // Convertir les pièces en format attendu
         const parts: Part[] =
@@ -841,5 +850,20 @@ export class KanbanComponent implements OnInit {
   calculateTotalPrice(parts: any[]): number {
     if (!parts) return 0;
     return parts.reduce((total, part) => total + part.prix * part.quantity, 0);
+  }
+
+  generatePdf(): void {
+    if (!this.selectedProject) return;
+
+    this.repairService.getRepairDetail(this.selectedProject.id).subscribe({
+      next: (response) => {
+        if (response?.data?.demande) {
+          this.pdfService.generateRepairPdf(response.data.demande);
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors de la génération du PDF:', error);
+      },
+    });
   }
 }
