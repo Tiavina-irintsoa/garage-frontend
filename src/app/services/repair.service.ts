@@ -99,6 +99,7 @@ export interface RepairDetail {
   images: string[];
   photos: string[];
   dateCreation: string;
+  date_facturation: string | null;
   statut: string;
   reference_paiement?: string;
   pieces_facture?: Array<{
@@ -149,9 +150,7 @@ export class RepairService {
   constructor(private http: HttpClient, private httpService: HttpService) {}
 
   getRepairsByStatus(status: RepairStatus): Observable<RepairResponse> {
-    return this.http.get<RepairResponse>(
-      `${this.apiUrl}/status/${status}`
-    );
+    return this.http.get<RepairResponse>(`${this.apiUrl}/status/${status}`);
   }
 
   getAllRepairs(): Observable<Repair[]> {

@@ -74,6 +74,8 @@ interface KanbanCard {
   mileage?: number;
   serviceType?: 'entretien' | 'réparation' | 'vidange';
   estimatedPrice?: number | null;
+  montant_total?: number | null;
+  date_facturation?: string | null;
   assignedTeam?: Array<{
     id: string;
     name: string;
@@ -91,7 +93,6 @@ interface KanbanCard {
     description?: string;
   }>;
   montant_pieces?: number | null;
-  montant_total?: number | null;
   invoiceUrl?: string;
   images?: string[];
 }
@@ -264,6 +265,7 @@ export class KanbanComponent implements OnInit {
       pieces_facture: repair.pieces_facture || [],
       montant_pieces: repair.montant_pieces,
       montant_total: repair.montant_total,
+      date_facturation: repair.date_facturation,
     };
   }
 
@@ -408,6 +410,7 @@ export class KanbanComponent implements OnInit {
       pieces_facture: [],
       montant_pieces: 0,
       montant_total: 0,
+      date_facturation: card.date_facturation,
     };
     this.isLoadingDetails = true;
 
@@ -451,6 +454,7 @@ export class KanbanComponent implements OnInit {
             montant_total: repair.montant_total || 0,
             description: repair.description || '',
             images: repair.images || [],
+            date_facturation: repair.date_facturation || '',
           };
         }
 

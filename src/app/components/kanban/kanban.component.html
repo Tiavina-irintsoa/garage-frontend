@@ -142,14 +142,23 @@
                         >{{ card.assignedTeam?.length || 0 }} assigné(s)</span
                       >
                     </div>
-                    <div
-                      class="flex items-center gap-2"
-                      *ngIf="card.montant_total !== null"
-                    >
-                      <i class="fas fa-tag text-gray-500"></i>
-                      <span class="text-sm text-gray-600">{{
-                        formatPrice(card.montant_total)
-                      }}</span>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="flex items-center gap-2"
+                        *ngIf="card.montant_total !== null"
+                      >
+                        <i class="fas fa-tag text-gray-500"></i>
+                        <span class="text-sm text-gray-600">{{
+                          formatPrice(card.montant_total)
+                        }}</span>
+                      </div>
+                      <button
+                        *ngIf="card.date_facturation"
+                        class="text-blue-600 hover:text-blue-800"
+                        title="Voir la facture"
+                      >
+                        <i class="fas fa-file-invoice"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
