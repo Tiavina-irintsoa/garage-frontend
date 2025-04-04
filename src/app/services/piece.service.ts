@@ -8,6 +8,14 @@ import {
   CreatePieceDto,
 } from '../models/piece.interface';
 
+export interface PiecesResponse {
+  data: {
+    pieces: Piece[];
+  };
+  error: null | string;
+  status: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,5 +42,11 @@ export class PieceService {
 
   deletePiece(id: string): Observable<void> {
     return this.http.authenticatedDelete<void>(`/pieces/${id}`);
+  }
+
+  getAllPieces(): Observable<Piece[]> {
+    return this.http
+      .get<PiecesResponse>('/pieces')
+      .pipe(map((response) => response.data.pieces));
   }
 }
