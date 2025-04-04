@@ -66,6 +66,7 @@ interface KanbanCard {
   clientName: string;
   carInfo: string;
   status: string;
+  statut: string;
   createdAt: Date;
   deadline?: Date;
   description?: string;
@@ -254,6 +255,7 @@ export class KanbanComponent implements OnInit {
       carInfo: `${repair.vehicule.marque.libelle} ${repair.vehicule.modele.libelle} - ${repair.vehicule.immatriculation}`,
       createdAt: new Date(repair.date_rdv),
       status: status,
+      statut: repair.statut || status,
       serviceType: 'réparation',
       estimatedPrice:
         status === 'ATTENTE_FACTURATION'
@@ -393,6 +395,7 @@ export class KanbanComponent implements OnInit {
 
     this.selectedProject = {
       id: card.id,
+      statut: card.statut,
       clientName: card.clientName,
       carInfo: card.carInfo,
       status: card.status,
@@ -407,8 +410,6 @@ export class KanbanComponent implements OnInit {
       assignedTeam: card.assignedTeam || [],
       services: [],
       parts: [],
-      images: [],
-      invoiceUrl: undefined,
       pieces_facture: [],
       montant_pieces: 0,
       montant_total: 0,
@@ -462,8 +463,9 @@ export class KanbanComponent implements OnInit {
             montant_pieces: repair.montant_pieces || 0,
             montant_total: repair.montant_total || 0,
             description: repair.description || '',
-            images: repair.images || [],
             date_facturation: repair.date_facturation || '',
+            statut: repair.statut || card.statut,
+            clientPhone: repair.client.telephone || '',
           };
         }
 

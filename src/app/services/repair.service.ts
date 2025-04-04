@@ -62,6 +62,7 @@ export interface Repair {
     prenom: string;
     email: string;
   };
+  statut: string;
 }
 
 export interface RepairResponse {
@@ -79,6 +80,7 @@ export interface RepairDetail {
     nom: string;
     prenom: string;
     email: string;
+    telephone: string;
   };
   vehicule: {
     id: string;
@@ -99,7 +101,7 @@ export interface RepairDetail {
     cout_estime: number;
     details: {
       coefficient_type: number;
-      facteur_etat: number
+      facteur_etat: number;
     };
   };
   services: Array<{
@@ -120,7 +122,7 @@ export interface RepairDetail {
   montant_total?: number;
   date_facturation?: string;
   reference_paiement?: string;
-  images?: string[];
+  statut?: RepairStatus;
 }
 
 export interface RepairDetailResponse {

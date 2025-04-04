@@ -540,194 +540,194 @@
                   </div>
 
                   <!-- Section des pièces -->
-                  <div class="mt-6 bg-white rounded-lg shadow p-4">
-                    <h3 class="text-lg font-medium mb-4">Pièces nécessaires</h3>
 
-                    <!-- Recherche de pièces avec autocomplétion -->
-                    <div class="relative">
-                      <div class="flex gap-2">
-                        <div class="flex-grow relative">
-                          <label
-                            for="searchPiece"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Rechercher une pièce
-                          </label>
-                          <input
-                            id="searchPiece"
-                            type="text"
-                            [formControl]="partsSearchControl"
-                            placeholder="Référence, nom ou description..."
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <!-- Liste d'autocomplétion -->
-                          <div
-                            *ngIf="filteredParts.length > 0"
-                            class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
-                          >
-                            <div
-                              *ngFor="let part of filteredParts"
-                              (click)="selectPart(part)"
-                              class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                              [class.bg-blue-50]="selectedPart?.id === part.id"
-                            >
-                              <div class="font-medium">
-                                {{ part.reference }} - {{ part.nom }}
-                              </div>
-                              <div class="text-sm text-gray-600">
-                                <span class="mr-4"
-                                  >Prix de référence:
-                                  {{ formatPrice(part.prix) }}</span
-                                >
-                                <span class="text-gray-500">{{
-                                  part.description
-                                }}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Champ prix unitaire -->
-                        <div class="w-36">
-                          <label
-                            for="prixUnitaire"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Prix unitaire
-                          </label>
-                          <input
-                            id="prixUnitaire"
-                            type="number"
-                            min="0"
-                            step="100"
-                            #priceInput
-                            [value]="selectedPart?.prix || 0"
-                            placeholder="Prix unitaire"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-
-                        <!-- Champ quantité -->
-                        <div class="w-24">
-                          <label
-                            for="quantite"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                          >
-                            Quantité
-                          </label>
-                          <input
-                            id="quantite"
-                            type="number"
-                            min="1"
-                            #quantityInput
-                            [value]="1"
-                            placeholder="Qté"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-
-                        <!-- Bouton d'ajout -->
-                        <button
-                          (click)="
-                            addPartToRepair(
-                              +quantityInput.value,
-                              +priceInput.value
-                            )
-                          "
-                          [disabled]="!selectedPart"
-                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        >
-                          <i class="fas fa-plus mr-2"></i>
-                          Ajouter
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Liste des pièces ajoutées -->
-                    <div class="mt-10">
-                      <div
-                        *ngIf="
-                          selectedProject?.parts &&
-                          selectedProject.parts.length === 0
-                        "
-                        class="text-gray-500 text-center py-4"
-                      >
-                        Aucune pièce ajoutée
-                      </div>
-                      <div
-                        *ngFor="let part of selectedProject?.parts || []"
-                        class="flex items-center justify-between py-2 border-b"
-                      >
-                        <div class="flex-grow">
-                          <div class="font-medium">
-                            {{ part.reference }} - {{ part.nom }}
-                          </div>
-                          <div class="text-sm mt-2 text-gray-600">
-                            {{ part.quantity }}x -
-                            {{ formatPrice(part.prix) }} (Total:
-                            {{ formatPrice(part.prix * part.quantity) }})
-                          </div>
-                          <!-- Informations de livraison -->
-                          <div class="text-sm mt-1">
-                            <span
-                              [ngClass]="{
-                                'text-yellow-600':
-                                  part.statut_livraison === 'en_attente',
-                                'text-blue-600':
-                                  part.statut_livraison === 'en_cours',
-                                'text-green-600':
-                                  part.statut_livraison === 'livree'
-                              }"
-                            >
-                              {{ getStatutLivraison(part.statut_livraison) }}
-                            </span>
-                            <span
-                              *ngIf="part.date_livraison_prevue"
-                              class="ml-2 text-gray-500"
-                            >
-                              (Livraison prévue le
-                              {{ formatDate(part.date_livraison_prevue) }})
-                            </span>
-                          </div>
-                          <div
-                            *ngIf="part.fournisseur"
-                            class="text-xs text-gray-500 mt-1"
-                          >
-                            Fournisseur: {{ part.fournisseur.nom }} -
-                            {{ part.fournisseur.contact }}
-                          </div>
-                        </div>
-                        <button
-                          (click)="removePartFromRepair(part.id)"
-                          class="text-red-600 hover:text-red-800 ml-4"
-                        >
-                          <i class="fas fa-trash"></i>
-                        </button>
-                      </div>
-
-                      <!-- Total des pièces -->
-                      <div
-                        *ngIf="
-                          selectedProject?.parts &&
-                          selectedProject.parts.length > 0
-                        "
-                        class="mt-10 pt-4 border-t flex justify-between"
-                      >
-                        <span class="font-medium">Total des pièces:</span>
-                        <span class="font-medium">{{
-                          formatPrice(
-                            calculateTotalPrice(selectedProject.parts)
-                          )
-                        }}</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Bouton de génération de PDF -->
+            <div class="mt-6 bg-white rounded-lg shadow p-4">
+              <h3 class="text-lg font-medium mb-4">Pièces nécessaires</h3>
 
+              <!-- Recherche de pièces avec autocomplétion -->
+              <div class="relative">
+                <div class="flex gap-2">
+                  <div class="flex-grow relative">
+                    <label
+                      for="searchPiece"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Rechercher une pièce
+                    </label>
+                    <input
+                      id="searchPiece"
+                      type="text"
+                      [formControl]="partsSearchControl"
+                      placeholder="Référence, nom ou description..."
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <!-- Liste d'autocomplétion -->
+                    <div
+                      *ngIf="filteredParts.length > 0"
+                      class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                    >
+                      <div
+                        *ngFor="let part of filteredParts"
+                        (click)="selectPart(part)"
+                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        [class.bg-blue-50]="selectedPart?.id === part.id"
+                      >
+                        <div class="font-medium">
+                          {{ part.reference }} - {{ part.nom }}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                          <span class="mr-4"
+                            >Prix de référence:
+                            {{ formatPrice(part.prix) }}</span
+                          >
+                          <span class="text-gray-500">{{
+                            part.description
+                          }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Champ prix unitaire -->
+                  <div class="w-36">
+                    <label
+                      for="prixUnitaire"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Prix unitaire
+                    </label>
+                    <input
+                      id="prixUnitaire"
+                      type="number"
+                      min="0"
+                      step="100"
+                      #priceInput
+                      [value]="selectedPart?.prix || 0"
+                      placeholder="Prix unitaire"
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <!-- Champ quantité -->
+                  <div class="w-24">
+                    <label
+                      for="quantite"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Quantité
+                    </label>
+                    <input
+                      id="quantite"
+                      type="number"
+                      min="1"
+                      #quantityInput
+                      [value]="1"
+                      placeholder="Qté"
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <!-- Bouton d'ajout -->
+                  <button
+                    (click)="
+                      addPartToRepair(
+                        +quantityInput.value,
+                        +priceInput.value
+                      )
+                    "
+                    [disabled]="!selectedPart"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    <i class="fas fa-plus mr-2"></i>
+                    Ajouter
+                  </button>
+                </div>
+              </div>
+
+              <!-- Liste des pièces ajoutées -->
+              <div class="mt-10">
+                <div
+                  *ngIf="
+                    selectedProject?.parts &&
+                    selectedProject.parts.length === 0
+                  "
+                  class="text-gray-500 text-center py-4"
+                >
+                  Aucune pièce ajoutée
+                </div>
+                <div
+                  *ngFor="let part of selectedProject?.parts || []"
+                  class="flex items-center justify-between py-2 border-b"
+                >
+                  <div class="flex-grow">
+                    <div class="font-medium">
+                      {{ part.reference }} - {{ part.nom }}
+                    </div>
+                    <div class="text-sm mt-2 text-gray-600">
+                      {{ part.quantity }}x -
+                      {{ formatPrice(part.prix) }} (Total:
+                      {{ formatPrice(part.prix * part.quantity) }})
+                    </div>
+                    <!-- Informations de livraison -->
+                    <div class="text-sm mt-1">
+                      <span
+                        [ngClass]="{
+                          'text-yellow-600':
+                            part.statut_livraison === 'en_attente',
+                          'text-blue-600':
+                            part.statut_livraison === 'en_cours',
+                          'text-green-600':
+                            part.statut_livraison === 'livree'
+                        }"
+                      >
+                        {{ getStatutLivraison(part.statut_livraison) }}
+                      </span>
+                      <span
+                        *ngIf="part.date_livraison_prevue"
+                        class="ml-2 text-gray-500"
+                      >
+                        (Livraison prévue le
+                        {{ formatDate(part.date_livraison_prevue) }})
+                      </span>
+                    </div>
+                    <div
+                      *ngIf="part.fournisseur"
+                      class="text-xs text-gray-500 mt-1"
+                    >
+                      Fournisseur: {{ part.fournisseur.nom }} -
+                      {{ part.fournisseur.contact }}
+                    </div>
+                  </div>
+                  <button
+                    (click)="removePartFromRepair(part.id)"
+                    class="text-red-600 hover:text-red-800 ml-4"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+
+                <!-- Total des pièces -->
+                <div
+                  *ngIf="
+                    selectedProject?.parts &&
+                    selectedProject.parts.length > 0
+                  "
+                  class="mt-10 pt-4 border-t flex justify-between"
+                >
+                  <span class="font-medium">Total des pièces:</span>
+                  <span class="font-medium">{{
+                    formatPrice(
+                      calculateTotalPrice(selectedProject.parts)
+                    )
+                  }}</span>
+                </div>
+              </div>
+            </div>
             <!-- Ajouter le bouton juste avant la fermeture de la modale -->
             <div class="mt-4 flex justify-between items-center">
               <button
@@ -840,7 +840,7 @@
             <span
               class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
             >
-              {{ selectedProject.status }}
+              {{ selectedProject.statut }}
             </span>
           </div>
         </div>
