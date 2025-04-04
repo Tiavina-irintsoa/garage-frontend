@@ -6,6 +6,13 @@ export interface Piece {
   prix: number;
   createdAt: string;
   updatedAt: string;
+  statut_livraison?: 'en_attente' | 'en_cours' | 'livree';
+  date_livraison_prevue?: string;
+  fournisseur?: {
+    id: string;
+    nom: string;
+    contact: string;
+  };
 }
 
 export interface PieceResponse {
