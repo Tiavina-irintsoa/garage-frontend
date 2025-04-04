@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { RepairService, Repair, RepairStatus } from '../../services/repair.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { marked } from 'marked';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 interface TeamMember {
   id: string;
@@ -15,19 +16,20 @@ interface TeamMember {
 
 interface Task {
   id: string;
-  description: string;
+  title: string;
   completed: boolean;
-  estimatedTime: number;
-  assignedTo: string;
+  assignedTo?: string;
+  assignedMember?: TeamMember;
+  estimatedTime?: number;
 }
 
 interface Part {
   id: string;
-  name: string;
   reference: string;
-  price: number;
+  nom: string;
+  description: string;
+  prix: number;
   quantity: number;
-  status: 'En stock' | 'En commande' | 'Non disponible';
 }
 
 interface Service {
@@ -36,7 +38,7 @@ interface Service {
   estimatedDuration: number;
   estimatedPrice: number;
   tasks: Task[];
-  requiredParts: Part[];
+  parts: Part[];
 }
 
 interface RepairCard {
@@ -78,6 +80,13 @@ interface KanbanCard {
   invoiceUrl?: string;
 }
 
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+}
+
 @Component({
   selector: 'app-kanban',
   standalone: true,
@@ -86,6 +95,9 @@ interface KanbanCard {
   styleUrls: ['./kanban.component.css']
 })
 export class KanbanComponent implements OnInit {
+  @ViewChild('assigneeSelect') assigneeSelect!: ElementRef<HTMLSelectElement>;
+  @ViewChild('newTaskInput') newTaskInput!: ElementRef<HTMLInputElement>;
+
   columns: KanbanColumn[] = [
     {
       id: 'ATTENTE_ASSIGNATION',
@@ -127,13 +139,22 @@ export class KanbanComponent implements OnInit {
   isLoading = true;
   isLoadingDetails = false;
 
+  private assigneeMenuState: { [key: string]: boolean } = {};
+  private partsMenuState: { [key: string]: boolean } = {};
+  private partsSearchText: { [key: string]: string } = {};
+  private selectedPartId: string | null = null;
+
+  availableParts: Part[] = [];
+
   constructor(
     private repairService: RepairService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
     this.loadRepairs();
+    this.loadAvailableParts();
   }
 
   private loadRepairs() {
@@ -317,7 +338,7 @@ export class KanbanComponent implements OnInit {
           estimatedDuration: service.temps_base,
           estimatedPrice: service.cout_base,
           tasks: [], // À implémenter quand les tâches seront disponibles
-          requiredParts: [] // À implémenter quand les pièces seront disponibles
+          parts: [] // À implémenter quand les pièces seront disponibles
         }));
 
         this.selectedProject = {
@@ -333,7 +354,20 @@ export class KanbanComponent implements OnInit {
           createdAt: new Date(repair.dateCreation),
           deadline: new Date(repair.deadline),
           status: repair.statut,
-          assignedTeam: [], // À implémenter quand l'équipe sera disponible
+          assignedTeam: [
+            {
+              id: '1',
+              name: 'Tsiory',
+              role: 'Mécanicien',
+              avatar: 'https://ui-avatars.com/api/?name=Tsiory&background=random'
+            },
+            {
+              id: '2',
+              name: 'Rova',
+              role: 'Mécanicien',
+              avatar: 'https://ui-avatars.com/api/?name=Rova&background=random'
+            }
+          ],
           services: services,
           images: repair.images,
           invoiceUrl: repair.reference_paiement ? `https://example.com/factures/${repair.reference_paiement}.pdf` : undefined
@@ -362,5 +396,170 @@ export class KanbanComponent implements OnInit {
     if (!markdown) return '';
     const html = marked.parse(markdown) as string;
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  toggleAssigneeMenu(taskId: string) {
+    this.assigneeMenuState[taskId] = !this.assigneeMenuState[taskId];
+  }
+
+  isAssigneeMenuOpen(taskId: string): boolean {
+    return this.assigneeMenuState[taskId] || false;
+  }
+
+  assignTaskToMember(service: Service, taskId: string, memberId: string) {
+    const task = service.tasks.find(t => t.id === taskId);
+    if (task) {
+      task.assignedTo = memberId;
+      task.assignedMember = this.selectedProject?.assignedTeam.find(m => m.id === memberId);
+      // Ici, vous pouvez ajouter la logique pour sauvegarder l'assignation
+    }
+    this.toggleAssigneeMenu(taskId);
+  }
+
+  setNewTaskAssignee(memberId: string) {
+    // Stocker l'assignation pour la prochaine tâche créée
+    this.newTaskAssignee = memberId;
+    const member = this.selectedProject?.assignedTeam.find(m => m.id === memberId);
+    this.newTaskAssigneeMember = member || null;
+    this.toggleAssigneeMenu('new');
+  }
+
+  private newTaskAssignee: string | null = null;
+  newTaskAssigneeMember: TeamMember | null = null;
+
+  addTask(service: Service, title: string) {
+    if (!title.trim()) return;
+    
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      completed: false,
+      assignedTo: this.newTaskAssignee || undefined,
+      assignedMember: this.newTaskAssigneeMember || undefined
+    };
+
+    service.tasks.push(newTask);
+    this.newTaskAssignee = null;
+    this.newTaskAssigneeMember = null;
+  }
+
+  removeTask(service: Service, taskId: string) {
+    if (service.tasks) {
+      service.tasks = service.tasks.filter(task => task.id !== taskId);
+    }
+  }
+
+  toggleTask(service: Service, taskId: string) {
+    if (service.tasks) {
+      const task = service.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.completed = !task.completed;
+      }
+    }
+  }
+
+  onTaskAssignmentChange(service: Service, taskId: string, event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.assignTask(service, taskId, selectElement.value);
+  }
+
+  // Méthode pour obtenir les tâches par défaut selon le type de service
+  getDefaultTasks(serviceType: string): Task[] {
+    switch (serviceType) {
+      case 'vidange':
+        return [
+          { id: '1', title: 'Vérifier le niveau d\'huile', completed: false },
+          { id: '2', title: 'Changer le filtre à huile', completed: false },
+          { id: '3', title: 'Remplacer l\'huile moteur', completed: false },
+          { id: '4', title: 'Vérifier les fuites', completed: false }
+        ];
+      case 'entretien':
+        return [
+          { id: '1', title: 'Vérifier les niveaux de liquides', completed: false },
+          { id: '2', title: 'Inspecter les freins', completed: false },
+          { id: '3', title: 'Vérifier les pneus', completed: false },
+          { id: '4', title: 'Contrôler les feux', completed: false },
+          { id: '5', title: 'Nettoyer le filtre à air', completed: false }
+        ];
+      case 'réparation':
+        return [
+          { id: '1', title: 'Diagnostic initial', completed: false },
+          { id: '2', title: 'Estimation des coûts', completed: false },
+          { id: '3', title: 'Validation avec le client', completed: false },
+          { id: '4', title: 'Réparation', completed: false },
+          { id: '5', title: 'Test de qualité', completed: false }
+        ];
+      default:
+        return [];
+    }
+  }
+
+  // Méthode pour initialiser les tâches par défaut pour un service
+  initializeDefaultTasks(service: Service) {
+    if (!service.tasks || service.tasks.length === 0) {
+      service.tasks = this.getDefaultTasks(service.type);
+    }
+  }
+
+  assignTask(service: Service, taskId: string, teamMemberId: string) {
+    const task = service.tasks.find(t => t.id === taskId);
+    if (task) {
+      task.assignedTo = teamMemberId;
+    }
+  }
+
+  togglePartsMenu(serviceId: string) {
+    this.partsMenuState[serviceId] = !this.partsMenuState[serviceId];
+  }
+
+  isPartsMenuOpen(serviceId: string): boolean {
+    return this.partsMenuState[serviceId] || false;
+  }
+
+  updatePartsSearch(serviceId: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.partsSearchText[serviceId] = input.value;
+    this.selectedPartId = null;
+  }
+
+  addPart(service: Service, partId: string | null, quantity: string) {
+    if (!partId) return;
+    
+    const part = this.availableParts.find(p => p.id === partId);
+    if (part) {
+      service.parts.push({
+        ...part,
+        quantity: parseInt(quantity, 10)
+      });
+      this.selectedPartId = null;
+      this.partsSearchText[service.id] = '';
+    }
+  }
+
+  removePart(service: Service, partId: string) {
+    service.parts = service.parts.filter(p => p.id !== partId);
+  }
+
+  private loadAvailableParts() {
+    this.http.get<Part[]>(`${environment.apiUrl}/pieces`).subscribe({
+      next: (parts) => {
+        this.availableParts = parts;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des pièces:', error);
+      }
+    });
+  }
+
+  getFilteredParts(serviceId: string): Part[] {
+    const searchText = this.partsSearchText[serviceId]?.toLowerCase() || '';
+    return this.availableParts.filter(part => 
+      part.nom.toLowerCase().includes(searchText) || 
+      part.reference.toLowerCase().includes(searchText)
+    );
+  }
+
+  selectPart(partId: string) {
+    this.selectedPartId = partId;
   }
 } 

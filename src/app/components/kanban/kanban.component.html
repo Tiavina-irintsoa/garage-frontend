@@ -133,11 +133,6 @@
                     </ng-container>
                   </div>
 
-                  <!-- Car Info -->
-                  <div class="text-sm text-gray-600">
-                    {{ card.carInfo }}
-                  </div>
-
                   <!-- Bottom Section -->
                   <div class="flex items-center justify-between pt-2">
                     <!-- Assigned To / Price -->
@@ -169,7 +164,7 @@
 <!-- Project Details Modal -->
 <div
   *ngIf="selectedProject"
-  class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
 >
   <div class="bg-white rounded-lg w-[1100px] max-h-[90vh] flex">
     <!-- Main Content -->
@@ -219,7 +214,7 @@
           </div>
 
           <!-- Grid Info Skeleton -->
-          <div class="grid grid-cols-2 gap-6 mb-6">
+          <div class="grid grid-cols-2 gap-6 mb-2">
             <div>
               <div
                 class="h-4 bg-gray-200 rounded w-32 mb-3 animate-pulse"
@@ -272,14 +267,8 @@
 
         <!-- Contenu du modal -->
         <ng-container *ngIf="!isLoadingDetails">
-          <div class="p-6">
-            <div class="flex justify-between items-start mb-6">
-              <div>
-                <h2 class="text-2xl font-bold text-gray-900">
-                  {{ selectedProject.clientName }}
-                </h2>
-                <p class="text-gray-600">{{ selectedProject.clientEmail }}</p>
-              </div>
+          <div class="pt-4 px-6">
+            <div class="flex justify-end">
               <button
                 (click)="closeProjectModal()"
                 class="text-gray-400 hover:text-gray-500"
@@ -300,29 +289,7 @@
               </button>
             </div>
 
-            <div class="grid grid-cols-2 gap-6 mb-6">
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                  Informations véhicule
-                </h3>
-                <p class="text-gray-600">{{ selectedProject.carInfo }}</p>
-                <p class="text-gray-600">{{ selectedProject.licensePlate }}</p>
-                <p class="text-gray-600">
-                  {{ formatMileage(selectedProject.mileage) }}
-                </p>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">Dates</h3>
-                <p class="text-gray-600">
-                  Créé le: {{ formatDate(selectedProject.createdAt) }}
-                </p>
-                <p class="text-gray-600">
-                  Deadline: {{ formatDate(selectedProject.deadline) }}
-                </p>
-              </div>
-            </div>
-
-            <div class="mb-6">
+            <div class="mb-4">
               <h3 class="text-sm font-medium text-gray-700 mb-2">
                 Description
               </h3>
@@ -332,7 +299,7 @@
               ></div>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-6 mt-2">
               <h3 class="text-sm font-medium text-gray-700 mb-2">Services</h3>
               <div class="space-y-4">
                 <div
@@ -350,9 +317,309 @@
                       formatPrice(service.estimatedPrice)
                     }}</span>
                   </div>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 mb-4">
                     Durée estimée: {{ service.estimatedDuration }}h
                   </p>
+
+                  <!-- Section des tâches -->
+                  <div class="mt-4">
+                    <div class="flex items-center justify-between mb-3">
+                      <h4 class="text-sm font-medium text-gray-700">Tâches</h4>
+                      <button
+                        (click)="initializeDefaultTasks(service)"
+                        class="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        Charger les tâches par défaut
+                      </button>
+                    </div>
+
+                    <!-- Liste des tâches -->
+                    <div class="space-y-2">
+                      <!-- Tâches existantes -->
+                      <div
+                        *ngFor="let task of service.tasks"
+                        class="flex items-center justify-between group bg-white rounded-lg p-2 hover:bg-gray-50"
+                      >
+                        <div class="flex items-center space-x-3 flex-1">
+                          <div class="relative">
+                            <input
+                              type="checkbox"
+                              [checked]="task.completed"
+                              (change)="toggleTask(service, task.id)"
+                              class="h-5 w-5 rounded-full border-2 border-gray-300 appearance-none checked:bg-blue-600 checked:border-blue-600 transition-colors cursor-pointer"
+                            />
+                            <i
+                              class="fas fa-check absolute text-white text-xs top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                              *ngIf="task.completed"
+                            ></i>
+                          </div>
+                          <span
+                            [class.line-through]="task.completed"
+                            [class.text-gray-400]="task.completed"
+                            class="text-sm text-gray-700 flex-1"
+                          >
+                            {{ task.title }}
+                          </span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                          <button
+                            (click)="removeTask(service, task.id)"
+                            class="text-gray-400 hover:text-gray-600"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                          <div class="relative">
+                            <button
+                              (click)="toggleAssigneeMenu(task.id)"
+                              class="text-gray-400 hover:text-gray-600"
+                            >
+                              <ng-container
+                                *ngIf="task.assignedMember; else defaultIcon"
+                              >
+                                <div
+                                  class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+                                >
+                                  <img
+                                    *ngIf="task.assignedMember.avatar"
+                                    [src]="task.assignedMember.avatar"
+                                    [alt]="task.assignedMember.name"
+                                    class="w-full h-full object-cover"
+                                  />
+                                  <i
+                                    *ngIf="!task.assignedMember.avatar"
+                                    class="fas fa-user text-gray-500 text-xs"
+                                  ></i>
+                                </div>
+                              </ng-container>
+                              <ng-template #defaultIcon>
+                                <i class="fas fa-user"></i>
+                              </ng-template>
+                            </button>
+                            <!-- Menu déroulant des assignés -->
+                            <div
+                              *ngIf="isAssigneeMenuOpen(task.id)"
+                              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                            >
+                              <div class="py-1">
+                                <div
+                                  class="px-4 py-2 text-sm text-gray-700 border-b border-gray-100"
+                                >
+                                  Assigner à
+                                </div>
+                                <div class="max-h-60 overflow-y-auto">
+                                  <div
+                                    *ngFor="
+                                      let member of selectedProject.assignedTeam
+                                    "
+                                    (click)="
+                                      assignTaskToMember(
+                                        service,
+                                        task.id,
+                                        member.id
+                                      )
+                                    "
+                                    class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center space-x-2"
+                                  >
+                                    <div
+                                      class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center"
+                                    >
+                                      <i
+                                        class="fas fa-user text-gray-500 text-xs"
+                                      ></i>
+                                    </div>
+                                    <span>{{ member.name }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Ajout de nouvelle tâche -->
+                      <div
+                        class="flex items-center justify-between group bg-white rounded-lg p-2 hover:bg-gray-50"
+                      >
+                        <div class="flex items-center space-x-3 flex-1">
+                          <div
+                            class="h-5 w-5 rounded-full border-2 border-gray-300"
+                          ></div>
+                          <input
+                            type="text"
+                            #newTaskInput
+                            placeholder="Ajouter une nouvelle tâche"
+                            class="flex-1 text-sm border-0 focus:ring-0 focus:ring-offset-0 bg-transparent outline-none placeholder-gray-400"
+                            (keyup.enter)="addTask(service, newTaskInput.value)"
+                          />
+                        </div>
+                        <div class="flex items-center space-x-2">
+                          <button
+                            (click)="addTask(service, newTaskInput.value)"
+                            class="text-gray-400 hover:text-gray-600"
+                          >
+                            <i class="fas fa-plus"></i>
+                          </button>
+                          <div class="relative">
+                            <button
+                              (click)="toggleAssigneeMenu('new')"
+                              class="text-gray-400 hover:text-gray-600"
+                            >
+                              <ng-container
+                                *ngIf="newTaskAssigneeMember; else defaultIcon"
+                              >
+                                <div
+                                  class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+                                >
+                                  <img
+                                    *ngIf="newTaskAssigneeMember.avatar"
+                                    [src]="newTaskAssigneeMember.avatar"
+                                    [alt]="newTaskAssigneeMember.name"
+                                    class="w-full h-full object-cover"
+                                  />
+                                  <i
+                                    *ngIf="!newTaskAssigneeMember.avatar"
+                                    class="fas fa-user text-gray-500 text-xs"
+                                  ></i>
+                                </div>
+                              </ng-container>
+                              <ng-template #defaultIcon>
+                                <i class="fas fa-user"></i>
+                              </ng-template>
+                            </button>
+                            <!-- Menu déroulant des assignés -->
+                            <div
+                              *ngIf="isAssigneeMenuOpen('new')"
+                              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                            >
+                              <div class="py-1">
+                                <div
+                                  class="px-4 py-2 text-sm text-gray-700 border-b border-gray-100"
+                                >
+                                  Assigner à
+                                </div>
+                                <div class="max-h-60 overflow-y-auto">
+                                  <div
+                                    *ngFor="
+                                      let member of selectedProject.assignedTeam
+                                    "
+                                    (click)="setNewTaskAssignee(member.id)"
+                                    class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center space-x-2"
+                                  >
+                                    <div
+                                      class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center"
+                                    >
+                                      <i
+                                        class="fas fa-user text-gray-500 text-xs"
+                                      ></i>
+                                    </div>
+                                    <span>{{ member.name }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Section des pièces -->
+                  <div class="mt-6">
+                    <div class="flex items-center justify-between mb-3">
+                      <h4 class="text-sm font-medium text-gray-700">
+                        Pièces nécessaires
+                      </h4>
+                      <div class="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          placeholder="Rechercher une pièce..."
+                          class="w-64 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          (input)="updatePartsSearch(service.id, $event)"
+                        />
+                        <button
+                          (click)="togglePartsMenu(service.id)"
+                          class="text-xs text-blue-600 hover:text-blue-800"
+                        >
+                          Ajouter
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Liste des pièces -->
+                    <div class="space-y-2">
+                      <!-- Pièces existantes -->
+                      <div
+                        *ngFor="let part of service.parts"
+                        class="flex items-center justify-between group bg-white rounded-lg p-2 hover:bg-gray-50"
+                      >
+                        <div class="flex items-center space-x-3 flex-1">
+                          <div class="w-5 h-5 flex items-center justify-center">
+                            <i class="fas fa-circle text-gray-400 text-xs"></i>
+                          </div>
+                          <span class="text-sm text-gray-700">
+                            {{ part.nom }} ({{ part.reference }}) -
+                            {{ part.quantity }}x
+                          </span>
+                          <span class="text-xs text-gray-500">
+                            {{ formatPrice(part.prix * part.quantity) }}
+                          </span>
+                        </div>
+                        <button
+                          (click)="removePart(service, part.id)"
+                          class="text-gray-400 hover:text-gray-600"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+
+                      <!-- Menu déroulant des pièces -->
+                      <div
+                        *ngIf="isPartsMenuOpen(service.id)"
+                        class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+                      >
+                        <div class="max-h-60 overflow-y-auto">
+                          <div
+                            *ngFor="let part of getFilteredParts(service.id)"
+                            class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                          >
+                            <div class="flex items-center justify-between">
+                              <div>
+                                <div class="font-medium">{{ part.nom }}</div>
+                                <div class="text-xs text-gray-500">
+                                  {{ part.reference }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                  {{ part.description }}
+                                </div>
+                              </div>
+                              <div class="text-right">
+                                <div class="font-medium">
+                                  {{ formatPrice(part.prix) }}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="mt-2 flex items-center space-x-2">
+                              <input
+                                type="number"
+                                min="1"
+                                value="1"
+                                #quantityInput
+                                class="w-20 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                              />
+                              <button
+                                (click)="
+                                  addPart(service, part.id, quantityInput.value)
+                                "
+                                class="text-xs text-blue-600 hover:text-blue-800"
+                              >
+                                Ajouter
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -373,7 +640,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="w-80 flex-shrink-0 p-6 space-y-6">
+    <div class="w-80 flex-shrink-0 p-6 space-y-6 overflow-y-auto">
       <!-- Skeleton loader pour la sidebar -->
       <div *ngIf="isLoadingDetails" class="space-y-6">
         <!-- Status Skeleton -->
@@ -481,20 +748,7 @@
             Équipe assignée
           </h3>
           <div class="space-y-2">
-            <div
-              *ngFor="let member of selectedProject.assignedTeam"
-              class="flex items-center space-x-2 bg-gray-50 p-2 rounded-lg"
-            >
-              <div
-                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center"
-              >
-                <i class="fas fa-user text-gray-500"></i>
-              </div>
-              <div>
-                <span class="text-sm font-medium">{{ member.name }}</span>
-                <p class="text-xs text-gray-500">{{ member.role }}</p>
-              </div>
-            </div>
+            <div class="text-sm text-gray-500 italic">Aucun membre assigné</div>
           </div>
         </div>
 
@@ -553,20 +807,6 @@
               <span>{{ formatMileage(selectedProject.mileage) }}</span>
             </div>
           </div>
-        </div>
-
-        <!-- Documents -->
-        <div>
-          <h3 class="text-sm font-medium text-gray-500 mb-2">Documents</h3>
-          <a
-            [href]="selectedProject.invoiceUrl"
-            target="_blank"
-            class="flex items-center space-x-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 rounded-lg transition-colors duration-200"
-          >
-            <i class="fas fa-file-pdf text-lg"></i>
-            <span class="font-medium">Télécharger la facture PDF</span>
-            <i class="fas fa-download ml-2"></i>
-          </a>
         </div>
       </ng-container>
     </div>
