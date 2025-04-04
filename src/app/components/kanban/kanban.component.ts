@@ -2,9 +2,10 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { RepairService, Repair, RepairStatus } from '../../services/repair.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { marked } from 'marked';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 interface TeamMember {
   id: string;
@@ -24,11 +25,11 @@ interface Task {
 
 interface Part {
   id: string;
-  name: string;
   reference: string;
-  price: number;
+  nom: string;
+  description: string;
+  prix: number;
   quantity: number;
-  status: 'En stock' | 'En commande' | 'Non disponible';
 }
 
 interface Service {
@@ -37,7 +38,7 @@ interface Service {
   estimatedDuration: number;
   estimatedPrice: number;
   tasks: Task[];
-  requiredParts: Part[];
+  parts: Part[];
 }
 
 interface RepairCard {
@@ -139,14 +140,21 @@ export class KanbanComponent implements OnInit {
   isLoadingDetails = false;
 
   private assigneeMenuState: { [key: string]: boolean } = {};
+  private partsMenuState: { [key: string]: boolean } = {};
+  private partsSearchText: { [key: string]: string } = {};
+  private selectedPartId: string | null = null;
+
+  availableParts: Part[] = [];
 
   constructor(
     private repairService: RepairService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
     this.loadRepairs();
+    this.loadAvailableParts();
   }
 
   private loadRepairs() {
@@ -330,7 +338,7 @@ export class KanbanComponent implements OnInit {
           estimatedDuration: service.temps_base,
           estimatedPrice: service.cout_base,
           tasks: [], // À implémenter quand les tâches seront disponibles
-          requiredParts: [] // À implémenter quand les pièces seront disponibles
+          parts: [] // À implémenter quand les pièces seront disponibles
         }));
 
         this.selectedProject = {
@@ -421,7 +429,7 @@ export class KanbanComponent implements OnInit {
 
   addTask(service: Service, title: string) {
     if (!title.trim()) return;
-
+    
     const newTask: Task = {
       id: Date.now().toString(),
       title: title.trim(),
@@ -498,5 +506,60 @@ export class KanbanComponent implements OnInit {
     if (task) {
       task.assignedTo = teamMemberId;
     }
+  }
+
+  togglePartsMenu(serviceId: string) {
+    this.partsMenuState[serviceId] = !this.partsMenuState[serviceId];
+  }
+
+  isPartsMenuOpen(serviceId: string): boolean {
+    return this.partsMenuState[serviceId] || false;
+  }
+
+  updatePartsSearch(serviceId: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.partsSearchText[serviceId] = input.value;
+    this.selectedPartId = null;
+  }
+
+  addPart(service: Service, partId: string | null, quantity: string) {
+    if (!partId) return;
+    
+    const part = this.availableParts.find(p => p.id === partId);
+    if (part) {
+      service.parts.push({
+        ...part,
+        quantity: parseInt(quantity, 10)
+      });
+      this.selectedPartId = null;
+      this.partsSearchText[service.id] = '';
+    }
+  }
+
+  removePart(service: Service, partId: string) {
+    service.parts = service.parts.filter(p => p.id !== partId);
+  }
+
+  private loadAvailableParts() {
+    this.http.get<Part[]>(`${environment.apiUrl}/pieces`).subscribe({
+      next: (parts) => {
+        this.availableParts = parts;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des pièces:', error);
+      }
+    });
+  }
+
+  getFilteredParts(serviceId: string): Part[] {
+    const searchText = this.partsSearchText[serviceId]?.toLowerCase() || '';
+    return this.availableParts.filter(part => 
+      part.nom.toLowerCase().includes(searchText) || 
+      part.reference.toLowerCase().includes(searchText)
+    );
+  }
+
+  selectPart(partId: string) {
+    this.selectedPartId = partId;
   }
 } 
